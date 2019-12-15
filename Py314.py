@@ -9,9 +9,7 @@ from termcolor import colored
 
 class Prompt(Cmd):
 
-    
-    prompt = 'Py314 > '
-    intro = 'Type help or ? to list commands.'
+
     tempList = []
     focus = ''
 
@@ -77,18 +75,36 @@ class Prompt(Cmd):
                     if doc:
                         print(f"{cmd.replace('do_', '')} \t\t{doc}")
 
-
-
-
     pass
+
+
+def displayBanner():
+
+    print(colored(r"""
+  _____         ____  __ _  _   
+ |  __ \       |___ \/_ | || |  
+ | |__) |   _    __) || | || |_ 
+ |  ___/ | | |  |__ < | |__   _|
+ | |   | |_| |  ___) || |  | |  
+ |_|    \__, | |____/ |_|  |_|  
+         __/ |                  
+        |___/                   
+
+
+    """, 'blue'))
+
+    return
+
 
 
 
 
 displayBanner()
 
-pmCmd = Prompt()
-pmCmd.cmdloop()
+Interpreter = Prompt()
+Interpreter.prompt = colored('Py314 > ', 'cyan')
+Interpreter.intro = 'Type help or ? to list commands.'
+Interpreter.cmdloop()
 
 
 
