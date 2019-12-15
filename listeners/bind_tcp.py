@@ -6,9 +6,6 @@ from os import system
 from netaddr import ip
 from termcolor import colored
 from prettytable import PrettyTable
-from core.Classes import SubInterpreter
-
-
 
 
 class PolymolyBindTcp():
