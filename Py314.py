@@ -4,7 +4,7 @@ import sys
 import glob
 from cmd import Cmd
 from termcolor import colored
-from listeners import (Py314Bind, ListenerPrompt)
+from listeners import startListeners
 
 
 class Prompt(Cmd):
@@ -26,10 +26,9 @@ class Prompt(Cmd):
         """Quit Polymole"""
         return True
 
-    def do_listener(self, arg):
+    def do_handler(self, arg):
         """Try to establish a connection with a Py314 agent"""
-        subPrompt = ListenerPrompt()
-        subPrompt.cmdloop()
+        startListeners()
 
     def do_generate(self, arg):
         """Generate a Py314 agent"""
