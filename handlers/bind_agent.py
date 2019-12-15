@@ -31,10 +31,6 @@ class Prompt(Cmd):
     def do_bg(self, arg):
         """Return to Py314 main interpreter"""
         return True
-    
-    def do_channel(self, arg):
-        """Display availables channels to interact with agent"""
-
 
     def do_exit(self, arg):
         """Quit Py314"""
