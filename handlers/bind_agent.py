@@ -20,6 +20,8 @@ class Prompt(Cmd):
         'verbose': False
     }
 
+# < -------------------------- OVERRIDE -------------------------- >
+
     def emptyline(self):
         """Called when an empty line is entered in response to the prompt.
 
@@ -27,6 +29,8 @@ class Prompt(Cmd):
         command entered.
 
         """
+
+# < -------------------------- COMMANDS -------------------------- >
 
     def do_bg(self, arg):
         """Return to Py314 main interpreter"""
@@ -53,19 +57,6 @@ class Prompt(Cmd):
         else:
             self.optionsDict[option] = value
 
-    def set_rhost(self):
-        """Define remote IP of Py314 agent to bind"""
-
-    def set_rport(self):
-        """Define remote port of Py314 agent to bind"""
-
-    def set_proxy(self):
-        """Define a proxy, which be use to bind Py314 agent : <type>://<ip>:<port>"""
-
-    def set_verbose(self):
-        """Enable verbosity of bind_agent handler (default : False)"""
-        self.optionsDict['verbose'] = arg
-
 
     def do_settings(self, arg):
         """Show currents settings of handler"""
@@ -88,6 +79,24 @@ class Prompt(Cmd):
                 table.add_row([optionName, optionValue, optionDoc])
 
         print(table)
+
+
+# < -------------------------- Handler OPTIONS -------------------------- >
+
+    def set_rhost(self):
+        """Define remote IP of Py314 agent to bind"""
+
+    def set_rport(self):
+        """Define remote port of Py314 agent to bind"""
+
+    def set_proxy(self):
+        """Define a proxy, which be use to bind Py314 agent : <type>://<ip>:<port>"""
+
+    def set_verbose(self):
+        """Enable verbosity of bind_agent handler (default : False)"""
+        self.optionsDict['verbose'] = arg
+
+
 
 
 
