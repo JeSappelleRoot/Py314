@@ -4,8 +4,29 @@ import socket
 import threading
 from os import system
 from netaddr import ip
+from cmd import Cmd
 from termcolor import colored
 from prettytable import PrettyTable
+
+class ListenerPrompt(Cmd):
+    """Prompt use to define listener and options"""
+
+    prompt = colored('(listener) > ', 'yellow')
+                
+
+    def do_exit(self, arg):
+        """Quit Py314"""
+        exit()
+
+    def do_bg(self, arg):
+        """Return to Py314 main prompt"""
+        return True
+
+
+    
+
+
+
 
 
 class Py314Bind():
