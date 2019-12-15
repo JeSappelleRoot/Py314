@@ -14,7 +14,7 @@ class Prompt(Cmd):
 
 
     optionsDict = {
-        'rhost': '',
+        'rhost': '10.0.10.110',
         'rport': 1234,
         'proxy': '', 
         'verbose': False
@@ -109,7 +109,7 @@ def startModule():
 def bindAgent(dictionnary):
 
     host = dictionnary['rhost']
-    port = dictionnary['rport']
+    port = int(dictionnary['rport'])
     proxy = dictionnary['proxy']
     verbose = dictionnary['verbose']
     
@@ -124,24 +124,22 @@ def bindAgent(dictionnary):
         print(f"[+] Connection established to {host}:{port}")
 
 
-        t = threading.Thread(target=sendCommand, daemon=True, args=((channel,)))
-        t.start()
+        while True:
 
-        t.join()
-        channel.close()
-        
+            try:
 
-    except KeyboardInterrupt:
-        print("Dans bindAgent")
-        choice = input('Do you want to quit PolyMoly channel [y/n] ? :')
+                sendCommand(channel)
 
-        if choice.lower() == 'y':
-            print("\nquitting PolyMole")
-            channel.close()
-            t.join()
-            return
-        elif choice.lower() == 'n':
-            pass
+            except KeyboardInterrupt:
+                choice = input('Do you want to quit bind_agent channel [y/n] ? :')
+
+                if choice.lower() == 'y':
+                    channel.close()
+                    return
+                elif choice.lower() == 'n':
+                    pass
+                else:
+                    pass
 
     except ConnectionError:
         print(f"[!] Can't established connection to {host}")
@@ -163,21 +161,22 @@ def sendCommand(channel):
 
     try:
 
-        while True:
+        command = input(f"shell > ").encode()
+        # If user want to clean console
+        if command == 'clear':
+            system('clear')
+        elif command == b'':
+            pass
+        else:
+            channel.sendall(command)
 
-            command = input(f"shell > ").encode()
-            # If user want to clean console
-            if command == 'clear':
-                system('clear')
-            else:
-                channel.sendall(command)
-                while True:
-                    rawResponse = channel.recv(bufferSize)
-                    if len(rawResponse) < bufferSize:
-                        break
+            while True:
+                rawResponse = channel.recv(bufferSize)
+                if len(rawResponse) < bufferSize:
+                    break
 
-                shellReponse = rawResponse.decode()
-                print(shellReponse)
+            shellReponse = rawResponse.decode()
+            print(shellReponse)
 
     except ConnectionResetError:
         print(f"\n[-] Channel reset by peer")
@@ -186,17 +185,6 @@ def sendCommand(channel):
     except BrokenPipeError:
         print(f"\n[-] Channel reset by peer (broken pipe)")
         return
-
-    except KeyboardInterrupt:
-        print("Dans sendCommand")
-        choice = input('Do you want to quit PolyMoly channel [y/n] ? :')
-
-        if choice.lower() == 'y':
-            print("\nquitting PolyMole")
-            channel.close()
-            return
-        elif choice.lower() == 'n':
-            pass
 
 
 
