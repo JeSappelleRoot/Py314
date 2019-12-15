@@ -4,7 +4,23 @@ import sys
 import glob
 from cmd import Cmd
 from termcolor import colored
-from listeners import startListeners
+from handlers import bind_agent
+
+def displayBanner():
+
+    print(colored(r"""
+  _____         ____  __ _  _   
+ |  __ \       |___ \/_ | || |  
+ | |__) |   _    __) || | || |_ 
+ |  ___/ | | |  |__ < | |__   _|
+ | |   | |_| |  ___) || |  | |  
+ |_|    \__, | |____/ |_|  |_|  
+         __/ |                  
+        |___/                   
+
+    """, 'blue'))
+
+    return
 
 
 class Prompt(Cmd):
@@ -26,35 +42,21 @@ class Prompt(Cmd):
         """Quit Polymole"""
         return True
 
-    def do_handler(self, arg):
-        """Try to establish a connection with a Py314 agent"""
-        startListeners()
+    def do_bind_agent(self, arg):
+        """Try to established a connection with binding a Py314 agent"""
+        bind_agent.startModule()
+
+    def do_reverse_agent(self, arg):
+        """Try to established a connection with listening a Py314 agent"""
 
     def do_generate(self, arg):
         """Generate a Py314 agent"""
 
 
 
-def displayBanner():
-
-    print(colored(r"""
-  _____         ____  __ _  _   
- |  __ \       |___ \/_ | || |  
- | |__) |   _    __) || | || |_ 
- |  ___/ | | |  |__ < | |__   _|
- | |   | |_| |  ___) || |  | |  
- |_|    \__, | |____/ |_|  |_|  
-         __/ |                  
-        |___/                   
-
-
-    """, 'blue'))
-
-    return
 
 
 try:
-
 
     displayBanner()
 
@@ -62,6 +64,11 @@ try:
     Interpreter.prompt = colored('Py314 > ', 'cyan')
     Interpreter.intro = 'Type help or ? to list commands.'
     Interpreter.cmdloop()
+
+
+
+
+
 
 except KeyboardInterrupt:
     exit()
