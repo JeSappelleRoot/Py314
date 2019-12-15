@@ -4,7 +4,7 @@ import sys
 import glob
 from cmd import Cmd
 from termcolor import colored
-from listeners import (Py314Bind)
+from listeners import (Py314Bind, ListenerPrompt)
 
 
 class Prompt(Cmd):
@@ -26,25 +26,10 @@ class Prompt(Cmd):
         """Quit Polymole"""
         return True
 
-    def do_help(self, arg):
-        sep = '='
-        headers = ['name', 'description']
-        sepList = []
-        for item in headers:
-            sepList.append(sep * len(item))
-        print('\t\t'.join(headers))
-        print('\t\t'.join(sepList))
-
-        commands = self.get_names()
-        for cmd in commands:
-            if cmd.startswith('do_'):
-                doc = getattr(self, cmd).__doc__
-                if doc:
-                    print(f"{cmd.replace('do_', '')}\t\t{doc}")
-
-
     def do_listener(self, arg):
         """Try to establish a connection with a Py314 agent"""
+        subPrompt = ListenerPrompt()
+        subPrompt.cmdloop()
 
     def do_generate(self, arg):
         """Generate a Py314 agent"""
