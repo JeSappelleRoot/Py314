@@ -29,6 +29,16 @@ class Prompt(Cmd):
     tempList = []
     focus = ''
 
+    def emptyline(self):
+        """Called when an empty line is entered in response to the prompt.
+
+        If this method is not overridden, it repeats the last nonempty
+        command entered.
+
+        """
+
+
+
     def do_banner(self, arg):
         """Clear console and display banner"""
         os.system('clear')
