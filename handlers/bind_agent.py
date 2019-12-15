@@ -48,7 +48,7 @@ class Prompt(Cmd):
         """Define remote port of Py314 agent to bind"""
 
     def set_proxy(self):
-        """Define a proxy, which be use to bind Py314 agent : <type>:<ip>:<port>"""
+        """Define a proxy, which be use to bind Py314 agent : <type>://<ip>:<port>"""
 
     def set_verbose(self):
         """Enable verbosity of bind_agent handler (default : False)"""
