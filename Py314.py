@@ -4,6 +4,7 @@ import sys
 import glob
 from cmd import Cmd
 from termcolor import colored
+from listeners import *
 
 
 
@@ -75,7 +76,10 @@ class Prompt(Cmd):
                     if doc:
                         print(f"{cmd.replace('do_', '')} \t\t{doc}")
 
-    pass
+    def do_listen(self, arg):
+        """Launch a listener for outgoing/incoming connecion"""
+
+        return
 
 
 def displayBanner():
