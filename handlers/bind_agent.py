@@ -54,6 +54,7 @@ class Prompt(Cmd):
     optionsDict = {
         'rhost': '10.0.10.110',
         'rport': 1234,
+        'password': 'Py314!',
         'proxy': '', 
         'verbose': False
     }
@@ -126,6 +127,9 @@ class Prompt(Cmd):
 
     def set_rport(self):
         """Define remote port of Py314 agent to bind"""
+
+    def set_password(self):
+        """Define a password use to connect to Py314 agent, symetric encrypt traffic"""
 
     def set_proxy(self):
         """Define a proxy, which be use to bind Py314 agent : <type>://<ip>:<port>"""
