@@ -7,6 +7,44 @@ from os import system
 from netaddr import ip
 from termcolor import colored
 from prettytable import PrettyTable
+import modules
+
+class Agent(Cmd):
+    """Agent prompt to use modules and interact with agent"""
+
+    intro = 'Type help or ? to list commands.'
+
+    def emptyline(self):
+        """Called when an empty line is entered in response to the prompt.
+
+        If this method is not overridden, it repeats the last nonempty
+        command entered.
+
+        """
+
+    def define_channel(self, arg):
+        """Define the open socket to interact with agent"""
+        self.channel = arg
+
+    def do_exit(self, arg):
+        """Quit agent and close the channel"""
+        self.channel.close()
+        return True
+
+    def do_shell(self, arg):
+        """Try to switch to a shell"""
+        while True:
+            try:
+                #shell(self.channel)
+                modules.shell(self.channel)
+            except KeyboardInterrupt:
+                break
+
+    def do_status(self, arg):
+        """Display information about open channel with agent"""
+        print(self.channel)
+    
+
 
 
 class Prompt(Cmd):
@@ -99,7 +137,9 @@ class Prompt(Cmd):
 
 
 
-
+# ------------------------------------------------------------------
+# ------------------------------ Main ------------------------------
+# ------------------------------------------------------------------
 
         
 
@@ -129,22 +169,24 @@ def bindAgent(dictionnary):
         print(f"[+] Connection established to {host}:{port}")
 
 
-        while True:
 
-            try:
+        try:
 
-                sendCommand(channel)
+            agentPrompt = Agent()
+            agentPrompt.prompt = colored(f"agent@{host}:{port} >", 'green') 
+            agentPrompt.define_channel(channel)
+            agentPrompt.cmdloop()
 
-            except KeyboardInterrupt:
-                choice = input('Do you want to quit bind_agent channel [y/n] ? :')
+        except KeyboardInterrupt:
+            choice = input('\nDo you want to quit bind_agent channel [y/n] ? :')
 
-                if choice.lower() == 'y':
-                    channel.close()
-                    return
-                elif choice.lower() == 'n':
-                    pass
-                else:
-                    pass
+            if choice.lower() == 'y':
+                channel.close()
+                return
+            elif choice.lower() == 'n':
+                pass
+            else:
+                pass
 
     except ConnectionError:
         print(f"[!] Can't established connection to {host}")
@@ -158,9 +200,10 @@ def bindAgent(dictionnary):
         print(f"[!] {error}")
         return
 
+# ------------------------------ Modules ------------------------------
 
 
-def sendCommand(channel):
+def shell(channel):
 
     bufferSize = 1024
 
@@ -190,6 +233,10 @@ def sendCommand(channel):
     except BrokenPipeError:
         print(f"\n[-] Channel reset by peer (broken pipe)")
         return
+
+
+
+
 
 
 
