@@ -1,8 +1,14 @@
+
+
+
+
+
+load = """
+
 import os
 import socket
 import threading
 import subprocess
-
 
 def serverHandler(channel):
 
@@ -121,3 +127,4 @@ while True:
         serverSocket.close()
         exit()
 
+"""
