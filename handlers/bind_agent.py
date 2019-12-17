@@ -1,13 +1,15 @@
 import sys
 import glob
 import socket
+import modules
+import hashlib
 import threading
 from cmd import Cmd
 from os import system
 from netaddr import ip
 from termcolor import colored
 from prettytable import PrettyTable
-import modules
+
 
 class Agent(Cmd):
     """Agent prompt to use modules and interact with agent"""
@@ -35,7 +37,6 @@ class Agent(Cmd):
         """Try to switch to a shell"""
         while True:
             try:
-                #shell(self.channel)
                 modules.shell(self.channel)
             except KeyboardInterrupt:
                 break
@@ -79,6 +80,12 @@ class Prompt(Cmd):
         """Quit Py314"""
         exit()
 
+    def do_password(self, arg):
+        password = self.optionsDict['password']
+        cipherPassword = hashlib.sha512(password.encode()).hexdigest()
+
+        print(cipherPassword)
+
     def do_run(self, arg):
         """Launch handler with defined settings"""
         bindAgent(self.optionsDict)
@@ -97,7 +104,7 @@ class Prompt(Cmd):
             self.optionsDict[option] = value
 
 
-    def do_settings(self, arg):
+    def do_options(self, arg):
         """Show currents settings of handler"""
 
         print("""\nThe bind_tcp handler is designed to bind a specified host with IP & port combination.""")
@@ -155,12 +162,26 @@ def startModule():
     subPrompt.cmdloop()
 
 
+def checkPassword(channel, password):
+
+    print('send password')
+    channel.sendall(password.encode())
+
+
+
+
+    return answer
+
+
 def bindAgent(dictionnary):
 
     host = dictionnary['rhost']
     port = int(dictionnary['rport'])
+    password = dictionnary['password']
     proxy = dictionnary['proxy']
     verbose = dictionnary['verbose']
+
+    ciperPassword = hashlib.sha512(password.encode()).hexdigest()
     
     try:
     
@@ -170,6 +191,9 @@ def bindAgent(dictionnary):
         channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         channel.connect((host, port))
+
+        checkPassword(channel, ciperPassword)
+
         print(f"[+] Connection established to {host}:{port}")
 
 
