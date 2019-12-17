@@ -20,14 +20,6 @@ class Agent(Cmd):
 
 # < -------------------------- OVERRIDE -------------------------- >
 
-    def emptyline(self):
-        """Called when an empty line is entered in response to the prompt.
-
-        If this method is not overridden, it repeats the last nonempty
-        command entered.
-
-        """
-
     def default(self, cmd):
         """Override default method, to send unknow command to remote shell"""
         try: 
@@ -42,6 +34,14 @@ class Agent(Cmd):
             print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
             return True
 
+    def emptyline(self):
+        """Called when an empty line is entered in response to the prompt.
+
+        If this method is not overridden, it repeats the last nonempty
+        command entered.
+
+        """
+        
 # < -------------------------- CUSTOM -------------------------- >
 
     def define_channel(self, arg):
