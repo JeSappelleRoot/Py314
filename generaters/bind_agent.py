@@ -1,4 +1,3 @@
-
 import os
 import socket
 import hashlib
@@ -128,7 +127,7 @@ BUFFER_SIZE = 1024
 bindPort = 1234
 bindAddress = '10.0.10.110'
 password = 'Py314!'
-#cipherPassword = hashlib.sha512(password.encode()).hexdigest()
+
 
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -146,10 +145,8 @@ while True:
         print(f"[+] Received Connection from {cliAddress[0]}")
         challenge = passwordChallenge(channel, password)
         if challenge is True:
-            print('Password match')
             serverHandler(channel)
         elif challenge is False:
-            print("Password doesn't match")
             channel.close()
 
 
