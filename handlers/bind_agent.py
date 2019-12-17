@@ -152,8 +152,6 @@ class Prompt(Cmd):
 # ------------------------------ Main ------------------------------
 # ------------------------------------------------------------------
 
-        
-
 def startModule():
 
     
@@ -162,12 +160,22 @@ def startModule():
     subPrompt.cmdloop()
 
 
-def checkPassword(channel, password):
+def passwordChallenge(channel, password):
 
-    print('send password')
+    bufferSize = 1024
+
     channel.sendall(password.encode())
 
+    while True:
+        challengeResponse = channel.recv(bufferSize)
+        if len(challengeResponse) < bufferSize:
+            break
 
+    answer = challengeResponse.decode()
+    if answer == hashlib.sha512(password.encode()).hexdigest():
+        answer = True
+    elif answer == ' ':
+        answer = False
 
 
     return answer
@@ -191,10 +199,15 @@ def bindAgent(dictionnary):
         channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         channel.connect((host, port))
+        challenge = passwordChallenge(channel, ciperPassword)
 
-        checkPassword(channel, ciperPassword)
 
-        print(f"[+] Connection established to {host}:{port}")
+        if challenge is True:
+            print(f"[+] Connection established to {host}:{port}")
+        elif challenge is False:
+            print(f"[!] Password doesn't match")
+            channel.close()
+            return
 
 
 
