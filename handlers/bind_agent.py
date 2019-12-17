@@ -18,6 +18,7 @@ class Agent(Cmd):
 
     intro = 'Type help or ? to list commands. (default input will be send to a remote shell)'
 
+# < -------------------------- OVERRIDE -------------------------- >
 
     def emptyline(self):
         """Called when an empty line is entered in response to the prompt.
@@ -41,11 +42,14 @@ class Agent(Cmd):
             print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
             return True
 
+# < -------------------------- CUSTOM -------------------------- >
 
     def define_channel(self, arg):
         """Define the open socket to interact with agent"""
         self.channel = arg
 
+
+# < -------------------------- COMMANDS -------------------------- >
 
     def do_check(self, arg):
 
@@ -76,16 +80,6 @@ class Agent(Cmd):
         """Quit agent and close the channel"""
         self.channel.close()
         return True
-
-    def do_shell(self, arg):
-        """Try to switch to a shell"""
-        while True:
-            try:
-                #self.check_agent()
-                modules.Shell(self.channel)
-            except KeyboardInterrupt:
-                break
-
 
     def do_status(self, arg):
         """Display information about open channel with agent"""
@@ -241,8 +235,6 @@ def bindAgent(dictionnary):
             agentPrompt = Agent()
             agentPrompt.prompt = colored(f"agent@{host}:{port} > ", 'green') 
             agentPrompt.define_channel(channel)
-
-
             agentPrompt.cmdloop()
 
         except KeyboardInterrupt:
