@@ -84,8 +84,6 @@ class Prompt(Cmd):
         password = self.optionsDict['password']
         cipherPassword = hashlib.sha512(password.encode()).hexdigest()
 
-        print(cipherPassword)
-
     def do_run(self, arg):
         """Launch handler with defined settings"""
         bindAgent(self.optionsDict)
