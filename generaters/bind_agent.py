@@ -53,7 +53,6 @@ def serverHandler(channel):
                     break
             # Decode bytes to str
             clientRequest = rawRequest.decode()
-            print(clientRequest)
 
             # If 'cd' command send
             if clientRequest.split(' ')[0] == 'cd':
