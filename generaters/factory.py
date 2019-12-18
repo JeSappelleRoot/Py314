@@ -7,7 +7,7 @@ class Prompt(Cmd):
     availableTypes = ['bind_agent', 'reverse_listener']
 
     optionsDict = {
-        'type': ''
+        'type': '',
         'rhost': '',
         'rport': 1234,
         'password': 'Py314!',
