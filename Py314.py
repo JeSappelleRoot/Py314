@@ -62,6 +62,7 @@ class Prompt(Cmd):
 
     def do_generate(self, arg):
         """Generate a Py314 agent"""
+        factory.startFactory()
 
 
 
