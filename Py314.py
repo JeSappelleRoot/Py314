@@ -79,7 +79,7 @@ def checkConfig():
 
 try:
 
-    #checkConfig()
+    checkConfig()
     displayBanner()
 
     Interpreter = Prompt()
