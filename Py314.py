@@ -5,6 +5,7 @@ import glob
 from cmd import Cmd
 from termcolor import colored
 from handlers import bind_agent
+from generaters import factory
 
 def displayBanner():
 
