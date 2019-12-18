@@ -9,11 +9,11 @@ class Prompt(Cmd):
     availableTypes = ['bind_agent', 'reverse_listener']
 
     optionsDict = {
-        'type': '',
-        'address': '',
+        'type': 'bind_agent',
+        'address': '10.0.10.110',
         'port': 1234,
         'password': 'Py314!',
-        'proxy': ''
+        'outfile': ''
     }
 
 
@@ -58,6 +58,28 @@ class Prompt(Cmd):
 
         print(table)
 
+    def do_set(self, arg):
+        """Set value for available option : set <option> <value>"""
+
+        if len(arg.split(' ')) > 2 or len(arg.split(' ')) < 2:
+            print(f"[!] Please specify set <option> <value>")
+        
+        else:
+
+            availableOptions = [options.replace('set_', '') for options in dir(self) if options.startswith('set_')]
+            print(availableOptions)
+            option = arg.split(' ')[0]
+            value = arg.split(' ')[1]
+
+            if option not in availableOptions:
+                print(f"[!] Option {option} can't be set")
+
+            elif option == 'type' and value not in self.availableTypes:
+                print(f"[!] Specify a valid type of agent : ")
+                for agent in self.availableTypes:
+                    print(f" - {agent}")
+            else:
+                self.optionsDict[option] = value
 
 # < -------------------------- factory OPTIONS -------------------------- >
 
@@ -67,16 +89,14 @@ class Prompt(Cmd):
     def set_address(self):
         """Define the IP address to bind/listen"""
 
+    def set_outfile(self):
+        """Define the output file which contain agent script"""
+
     def set_port(self):
         """Define the port of Py314 agent to bind/listen"""
 
     def set_password(self):
         """Define a password use to connect to Py314 agent and to perform symetric encryption of traffic"""
-
-    def set_proxy(self):
-        """Define a proxy, which be use to bind Py314 agent : <type>://<ip>:<port>"""
-
-
 
 
 
