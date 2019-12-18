@@ -175,7 +175,7 @@ class Prompt(Cmd):
         """Define remote port of Py314 agent to bind"""
 
     def set_password(self):
-        """Define a password use to connect to Py314 agent, symetric encrypt traffic"""
+        """Define a password use to connect to Py314 agent and to perform symetric encryption of traffic"""
 
     def set_proxy(self):
         """Define a proxy, which be use to bind Py314 agent : <type>://<ip>:<port>"""
