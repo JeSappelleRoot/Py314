@@ -37,7 +37,7 @@ class Crypto():
 
 
     def encrypt_message(self, message):
-        """Encrypt simple message which will be return a string and not bytes"""
+        """Encrypt a message with str type and return message as str encrypted"""
         
         message = message.encode()
         encrypted = self.fernet.encrypt(message)
@@ -62,7 +62,7 @@ class Crypto():
 
     
     def decrypt_message(self, message):
-        """Decrypt simple message which will be return a string and not bytes"""
+        """Decrypt a message with str type and return message as str decrypted"""
 
         message = message.encode()
         decrypted = self.fernet.decrypt(message)
