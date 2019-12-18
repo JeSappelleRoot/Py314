@@ -60,7 +60,7 @@ class Prompt(Cmd):
     def do_reverse_agent(self, arg):
         """Try to established a connection with listening a Py314 agent"""
 
-    def do_generate(self, arg):
+    def do_factory(self, arg):
         """Generate a Py314 agent"""
         factory.startFactory()
 
