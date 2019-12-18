@@ -76,6 +76,9 @@ def checkConfig():
         print(f'[!] It will be created ')
         os.makedirs(py314Folder)
 
+    return
+
+
 
 try:
 
