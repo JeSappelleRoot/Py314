@@ -65,11 +65,21 @@ class Prompt(Cmd):
         factory.startFactory()
 
 
+def checkConfig():
 
+
+    homeFolder = os.environ['HOME']
+    py314Folder = f"{homeFolder}/.Py314"
+    
+    if not os.path.isdir(py314Folder):
+        print(f"[!] Folder {py314Folder} doesn't exist")
+        print(f'[!] It will be created ')
+        os.makedirs(py314Folder)
 
 
 try:
 
+    #checkConfig()
     displayBanner()
 
     Interpreter = Prompt()
