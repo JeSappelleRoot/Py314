@@ -1,6 +1,12 @@
-def Shell(channel, command):
+from crypto import Crypto
+
+def Shell(channel, password, command):
     """Try to interact with remote agent with a shell"""
 # Module to send a shell command to remote agent
+
+
+    crypto = Crypto(password)
+
 
     # Define a buffer size, 1024 bytes
     bufferSize = 1024
@@ -18,7 +24,7 @@ def Shell(channel, command):
             if len(rawResponse) < bufferSize:
                 break
         # Decode bytes to string to read the answer of the remote agent
-        shellReponse = rawResponse.decode()
+        shellReponse = crypto.decrypt_message(rawResponse.decode())
         # Print agent's answer
         print(shellReponse)
 
