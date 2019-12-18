@@ -1,4 +1,5 @@
-
+import os
+from generaters import bind_agent
 from cmd import Cmd
 from termcolor import colored
 from prettytable import PrettyTable
@@ -7,13 +8,15 @@ class Prompt(Cmd):
     """Simple Py314 agent factory"""
 
     availableTypes = ['bind_agent', 'reverse_listener']
+    homeFolder = os.environ['HOME']
+    py314Folder = f"{homeFolder}/.Py314"
 
     optionsDict = {
         'type': 'bind_agent',
         'address': '10.0.10.110',
         'port': 1234,
         'password': 'Py314!',
-        'outfile': ''
+        'outfile': f"{py314Folder}/agent.py"
     }
 
 
@@ -35,6 +38,23 @@ class Prompt(Cmd):
     def do_exit(self, arg):
         """Quit Py314"""
         exit()
+
+    def do_generate(self, arg):
+        """Generate agent with given options"""
+
+        for key, value in self.optionsDict.items():
+            if value == '':
+                print(f"[!] The option {key} can't be empty")
+        if self.optionsDict['type'] == 'bind_agent':
+            bind_agent.writeAgent(
+                self.optionsDict['outfile'],
+                self.optionsDict['address'],
+                self.optionsDict['port'],
+                self.optionsDict['password']
+            )
+            
+            
+
 
     def do_options(self, arg):
         """Show currents settings of handler"""
@@ -67,7 +87,6 @@ class Prompt(Cmd):
         else:
 
             availableOptions = [options.replace('set_', '') for options in dir(self) if options.startswith('set_')]
-            print(availableOptions)
             option = arg.split(' ')[0]
             value = arg.split(' ')[1]
 
