@@ -1,7 +1,9 @@
 import base64
+import os
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
 
@@ -10,12 +12,18 @@ class Crypto():
 
     def __init__(self, password):
     
-        self.password = password.encode()
-        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        digest.update(self.password)
+        self.salt = os.urandom(16)
+        self.password = password
 
-        self.key = base64.urlsafe_b64encode(digest.finalize())
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=self.salt,
+            iterations=100000,
+            backend=default_backend()
+        )
 
+        self.key = base64.urlsafe_b64encode(kdf.derive(self.password.encode()))
         self.fernet = Fernet(self.key)
 
 
