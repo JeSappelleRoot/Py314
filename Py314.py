@@ -2,10 +2,13 @@ import re
 import os
 import sys
 import glob
+import logging
 from cmd import Cmd
 from termcolor import colored
 from handlers import bind_agent
 from generaters import factory
+from logger import setup_logger
+
 
 def displayBanner():
 
@@ -78,10 +81,23 @@ def checkConfig():
 
     return
 
+def checkLevel(args):
+
+    if len(args) > 1 and args[1] == '-v':
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
+
+    return level
+
 
 
 try:
 
+
+    logger = setup_logger('main')
+    logger.setLevel(checkLevel(sys.argv))
+    
     checkConfig()
     displayBanner()
 
