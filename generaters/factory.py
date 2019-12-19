@@ -60,8 +60,6 @@ class Prompt(Cmd):
                 self.optionsDict['password']
             )
             
-            
-
 
     def do_options(self, arg):
         """Show currents settings of handler"""
