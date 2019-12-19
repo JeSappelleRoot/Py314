@@ -20,12 +20,6 @@ class Prompt(Cmd):
         'outfile': f"{py314Folder}/agent.py"
     }
 
-    def define_logger(self, arg):
-        """Define a logger object, to clean display"""
-
-        self.logger = arg
-
-
 
 # < -------------------------- OVERRIDE -------------------------- >
 
@@ -54,10 +48,10 @@ class Prompt(Cmd):
         for key, value in self.optionsDict.items():
             if value == '':
                 generation = False
-                self.logger.warning(f"The option {key} can't be empty")
+                logger.warning(f"The option {key} can't be empty")
 
         if generation is True:
-            
+
             if self.optionsDict['type'] == 'bind_agent':
                 bind_agent.writeAgent(
                     self.optionsDict['outfile'],
@@ -93,7 +87,7 @@ class Prompt(Cmd):
         """Set value for available option : set <option> <value>"""
 
         if len(arg.split(' ')) > 2 or len(arg.split(' ')) < 2:
-            self.logger.warning(f"Please specify set <option> <value>")
+            logger.warning(f"Please specify set <option> <value>")
         
         else:
 
@@ -102,31 +96,31 @@ class Prompt(Cmd):
             value = arg.split(' ')[1]
 
             if option not in availableOptions:
-                self.logger.warning(f"[!] Option {option} can't be set")
+                logger.warning(f"[!] Option {option} can't be set")
 
             elif option == 'type' and value not in self.availableTypes:
-                self.logger.warning(f"Specify a valid type of agent : ")
+                logger.warning(f"Specify a valid type of agent : ")
                 for agent in self.availableTypes:
                     print(f" - {agent}")
             else:
+                logger.debug(f'Option [{option}] set to [{value}]')
                 self.optionsDict[option] = value
 
 
 
     def do_unset(self, arg):
-        """Unset value for available option : set <option>"""
+        """Unset value for available option : unset <option>"""
 
         if len(arg.split(' ')) > 1 or len(arg.split(' ')) < 1:
-            self.logger.warning(f"Please specify unset <option>")
+            logger.warning(f"Please specify unset <option>")
         
         else:
 
             availableOptions = [options.replace('set_', '') for options in dir(self) if options.startswith('set_')]
             option = arg.split(' ')[0]
-            #value = arg.split(' ')[1]
 
             if option not in availableOptions:
-                self.logger.warning(f"Option {option} can't be unset")
+                logger.warning(f"Option {option} can't be unset")
             else:
                 self.optionsDict[option] = ''
 
@@ -156,11 +150,15 @@ class Prompt(Cmd):
 
 def startFactory():
 
-    logger = logging.getLogger('main')
+    
 
     subPrompt = Prompt()
-    subPrompt.define_logger(logger)
     subPrompt.prompt = f"({colored('factory', 'magenta')}) > "
     subPrompt.cmdloop()
 
 
+# --------------------------------------------------------------------
+# --------------------------- Main -----------------------------------
+# --------------------------------------------------------------------
+
+logger = logging.getLogger('main')
