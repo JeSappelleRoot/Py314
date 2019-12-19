@@ -22,13 +22,19 @@ def Shell(channel, password, command):
         logger.debug(f'Shell command after encryption : {command}')
         channel.sendall(command.encode())
 
+        rawResponse, tempBuffer = b'', b''
         # While True, receive data
         while True:
             logger.debug('recv from socket...')
-            rawResponse = channel.recv(bufferSize)
+
+            tempBuffer = channel.recv(bufferSize)
+            rawResponse += tempBuffer
+            
             logger.debug(f'Partial answer : {rawResponse}')
+            logger.debug(f'Raw answer lengh : {len(rawResponse)}')
+            #logger.debug(f'Temporary buffer : {tempBuffer}')
             # If all data are smaller than the buffer size, break While loop
-            if len(rawResponse) < bufferSize:
+            if len(tempBuffer) < bufferSize:
                 logger.debug('break recv while loop')
                 break
         # Decode bytes to string to read the answer of the remote agent
