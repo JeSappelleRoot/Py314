@@ -1,7 +1,7 @@
 import base64
 import os
 import hashlib
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken, InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -70,22 +70,18 @@ def decrypt_file(password, infile, outfile):
 def decrypt_message(password, message):
     """Decrypt a message with str type and return message as str decrypted"""
 
-    fernet = Fernet(generate_key(password))
+    try:
 
-    message = message.encode()
-    decrypted = fernet.decrypt(message)
+        fernet = Fernet(generate_key(password))
 
-    return decrypted.decode()
+        message = message.encode()
+        decrypted = fernet.decrypt(message)
 
-password = 'Py314!'
-message = 'Hello world !'
+        return decrypted.decode()
 
-encrypted = encrypt_message(password, message)
-decrypted = decrypt_message(password, encrypted)
+    except Exception as error:
+        print(f'[!] An error occured during decryption : {error}')
 
 
-print(message)
-print(encrypted)
-print(decrypted)
 
 
