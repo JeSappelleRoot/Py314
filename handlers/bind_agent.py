@@ -3,12 +3,14 @@ import glob
 import time
 import socket
 import modules
+import logging
 import hashlib
 import threading
 from cmd import Cmd
 from os import system
 from netaddr import ip
 from termcolor import colored
+#from logger import setup_logger
 from prettytable import PrettyTable
 
 
@@ -27,11 +29,11 @@ class Agent(Cmd):
             modules.Shell(self.channel, self.password, cmd)
 
         except ConnectionResetError:
-            print(colored(f"\n[-] Channel reset by peer", 'red'))
+            logger.warning(f"Channel reset by peer")
             return True
 
         except BrokenPipeError:
-            print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
+            logger.warning(f"Channel reset by peer (broken pipe error)")
             return True
 
     def emptyline(self):
@@ -69,11 +71,10 @@ class Agent(Cmd):
             # Decode bytes to string to read the answer of the remote agent
             checkAnswer = rawResponse.decode()
             if checkAnswer == 'alive !':
-                print(colored(f"[+] Agent is alive", 'green'))
+                logger.info(colored(f"[+] Agent is alive", 'green'))
 
         except ConnectionResetError:
-            print(colored(f"\n[-] Channel reset by peer", 'red'))
-            print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
+            logger.warning(f"Channel reset by peer (broken pipe error)")
             return True
         
         
@@ -139,7 +140,7 @@ class Prompt(Cmd):
         value = arg.split(' ')[1]
 
         if option not in availableOptions:
-            print(f"[!] Option {option} can't be set with this handler")
+            logger.info(f"Option {option} can't be set with this handler")
         else:
             self.optionsDict[option] = value
 
@@ -193,6 +194,8 @@ class Prompt(Cmd):
 # ------------------------------------------------------------------
 
 BUFFER_SIZE = 4096
+logger = logging.getLogger('main')
+
 
 def startModule():
 
@@ -215,7 +218,8 @@ def bindAgent(dictionnary):
     
     try:
     
-        print(f"[+] Trying to connect to {host}:{port}")
+        #print(f"[+] Trying to connect to {host}:{port}")
+        logger.info(f"Trying to connect to {host}:{port}")
 
         channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -225,9 +229,12 @@ def bindAgent(dictionnary):
 
 
         if challenge is True:
-            print(f"[+] Connection established to {host}:{port}")
+            logger.info(f"Connection established to {host}:{port}")
+            logger.debug(f'Successfull password challenge with : ')
+            logger.debug(f'Password > {password}')
+            logger.debug(f'SHA512 > {ciperPassword}')
         elif challenge is False:
-            print(f"[!] Password doesn't match")
+            logger.info(f"[!] Password doesn't match")
             channel.close()
             return
 
@@ -251,7 +258,7 @@ def bindAgent(dictionnary):
                 pass
 
     except ConnectionError:
-        print(f"[!] Can't established connection to {host}")
+        logger.info(f"Can't established connection to {host}")
         return
 
     except ConnectionRefusedError as e:
@@ -259,7 +266,7 @@ def bindAgent(dictionnary):
         return
 
     except OSError as error:
-        print(f"[!] {error}")
+        logger.warning(f"{error}")
         return
 
 
@@ -296,12 +303,12 @@ def checkAgent(channel, objet):
             channel.sendall(b'alive ?')
 
         except ConnectionResetError:
-            print(colored(f"\n[-] Channel reset by peer", 'red'))
+            logger.warning(f"Channel reset by peer")
             objet.do_exit()
             break
 
         except BrokenPipeError:
-            print(colored(f"\n[-] Channel reset by peer (broken pipe error)", 'red'))
+            logger.warning(f"\nChannel reset by peer (broken pipe error)")
             objet.exit_prompt
             break
         
