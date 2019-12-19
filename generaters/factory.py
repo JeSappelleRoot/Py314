@@ -51,7 +51,7 @@ class Prompt(Cmd):
 
         for key, value in self.optionsDict.items():
             if value == '':
-                self.logger.warning(f"[!] The option {key} can't be empty")
+                self.logger.warning(f"The option {key} can't be empty")
         if self.optionsDict['type'] == 'bind_agent':
             bind_agent.writeAgent(
                 self.optionsDict['outfile'],
@@ -64,7 +64,7 @@ class Prompt(Cmd):
     def do_options(self, arg):
         """Show currents settings of handler"""
 
-        print("""\nThe bind_tcp handler is designed to bind a specified host with IP & port combination.""")
+        print("""\nThe bind_agent handler is designed to bind a specified host with IP & port combination.""")
         print("""If the connection is successfull, a shell is automatically give, and remote actions are allowed\n""")
 
         table = PrettyTable()
@@ -87,7 +87,7 @@ class Prompt(Cmd):
         """Set value for available option : set <option> <value>"""
 
         if len(arg.split(' ')) > 2 or len(arg.split(' ')) < 2:
-            self.logger.warning(f"[!] Please specify set <option> <value>")
+            self.logger.warning(f"Please specify set <option> <value>")
         
         else:
 
@@ -99,7 +99,7 @@ class Prompt(Cmd):
                 self.logger.warning(f"[!] Option {option} can't be set")
 
             elif option == 'type' and value not in self.availableTypes:
-                self.logger.warning(f"[!] Specify a valid type of agent : ")
+                self.logger.warning(f"Specify a valid type of agent : ")
                 for agent in self.availableTypes:
                     print(f" - {agent}")
             else:
@@ -111,7 +111,7 @@ class Prompt(Cmd):
         """Unset value for available option : set <option>"""
 
         if len(arg.split(' ')) > 1 or len(arg.split(' ')) < 1:
-            self.logger.warning(f"[!] Please specify unset <option>")
+            self.logger.warning(f"Please specify unset <option>")
         
         else:
 
@@ -120,7 +120,7 @@ class Prompt(Cmd):
             #value = arg.split(' ')[1]
 
             if option not in availableOptions:
-                self.logger.warning(f"[!] Option {option} can't be unset")
+                self.logger.warning(f"Option {option} can't be unset")
             else:
                 self.optionsDict[option] = ''
 
