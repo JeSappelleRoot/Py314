@@ -2,6 +2,39 @@
 import crypto
 import logging
 
+def Check(channel, password):
+
+
+    try:
+
+        logger = logging.getLogger('main')
+
+        bufferSize = 4096
+        checkMessage = crypto.encrypt_message(password, 'alive ?').encode()
+        channel.sendall(checkMessage)
+        rawResponse, tempBuffer = b'', b''
+
+        while True:
+
+            tempBuffer = channel.recv(bufferSize)
+            rawResponse += tempBuffer
+            
+            # If all data are smaller than the buffer size, break While loop
+            if len(tempBuffer) < bufferSize:
+                break
+        # Decode bytes to string to read the answer of the remote agent
+
+        checkAnswer = crypto.decrypt_message(password, rawResponse.decode())
+        if checkAnswer == 'alive !':
+            logger.info(f"Agent is alive")
+
+    except ConnectionResetError:
+        logger.warning(f"Channel reset by peer (broken pipe error)")
+        return True
+
+
+
+
 def Shell(channel, password, command):
     """Try to interact with remote agent with a shell"""
 # Module to send a shell command to remote agent
