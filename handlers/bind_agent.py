@@ -59,25 +59,7 @@ class Agent(Cmd):
     def do_check(self, arg):
 
         modules.Check(self.channel, self.password)
-        """
-        try:
-            bufferSize = BUFFER_SIZE
-            self.channel.sendall(b'alive ?')
-            rawResponse, tempBuffer = b'', b''
-            while True:
-                rawResponse = self.channel.recv(bufferSize)
-                # If all data are smaller than the buffer size, break While loop
-                if len(rawResponse) < bufferSize:
-                    break
-            # Decode bytes to string to read the answer of the remote agent
-            checkAnswer = rawResponse.decode()
-            if checkAnswer == 'alive !':
-                logger.info(colored(f"[+] Agent is alive", 'green'))
 
-        except ConnectionResetError:
-            logger.warning(f"Channel reset by peer (broken pipe error)")
-            return True
-        """
         
     def do_exit(self, arg):
         """Quit agent and close the channel"""
@@ -137,13 +119,20 @@ class Prompt(Cmd):
 
         availableOptions = [options.replace('set_', '') for options in dir(self) if options.startswith('set_')]
         
-        option = arg.split(' ')[0]
-        value = arg.split(' ')[1]
+        if len(arg.split(' ')) > 1:
 
-        if option not in availableOptions:
-            logger.info(f"Option {option} can't be set with this handler")
+            option = arg.split(' ')[0]
+            value = arg.split(' ')[1]
+
+            if option not in availableOptions:
+                logger.info(f"Option {option} can't be set with this handler")
+            else:
+                self.optionsDict[option] = value
+                logger.debug(f'Option [{option}] set to [{value}]')
         else:
-            self.optionsDict[option] = value
+            logger.warning(f'Please specify an <option> and a associated <value>')
+
+
 
 
     def do_options(self, arg):
@@ -167,6 +156,25 @@ class Prompt(Cmd):
                 table.add_row([optionName, optionValue, optionDoc])
 
         print(table)
+
+    def do_unset(self, arg):
+        """Unset value for available option : unset <option>"""
+
+        if len(arg.split(' ')) > 1 or len(arg.split(' ')) < 1:
+            self.logger.warning(f"Please specify unset <option>")
+        
+        else:
+
+            availableOptions = [options.replace('set_', '') for options in dir(self) if options.startswith('set_')]
+            option = arg.split(' ')[0]
+            #value = arg.split(' ')[1]
+
+            if option not in availableOptions:
+                logger.warning(f"Option {option} can't be unset")
+            else:
+                self.optionsDict[option] = ''
+
+
 
 
 # < -------------------------- Handler OPTIONS -------------------------- >
@@ -202,6 +210,7 @@ def startModule():
 
     
     subPrompt = Prompt()
+    #subPrompt.define_logger(logger)
     subPrompt.prompt = f"({colored('bind_agent', 'yellow')}) > "
     subPrompt.cmdloop()
 
