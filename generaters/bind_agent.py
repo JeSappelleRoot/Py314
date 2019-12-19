@@ -145,19 +145,23 @@ def serverHandler(channel, password):
 # ------------------------------- Py314 REQUEST PARSING -------------------------------
 
             # If 'cd' command send
+
+            
             if clientRequest.split(' ')[0] == 'cd':
-                workingDir = clientRequest.split(' ')[1]
-                if os.path.isdir(workingDir):
-                    os.chdir(workingDir)
-                    # Return empty output, to not block the remote shell
-                    output = ' '
+                if len(clientRequest.split(' ')) > 2:
+                    workingDir = clientRequest.split(' ')[1]
+                    if os.path.isdir(workingDir):
+                        os.chdir(workingDir)
+                        # Return empty output, to not block the remote shell
+                        output = ' '
+                    else:
+                        output = f"{{workingDir}} doesn'nt exist"
                 else:
-                    output = f"{{workingDir}} doesn'nt exist"
+                    output = f"Incomplete cd command"
 
             # If check alive
             elif clientRequest == 'alive ?':
                 output  = "alive !"
-                channel.sendall(reponse.encode())
             
             # Else execute shell command
             else:
