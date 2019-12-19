@@ -49,17 +49,23 @@ class Prompt(Cmd):
     def do_generate(self, arg):
         """Generate agent with given options"""
 
+        generation = True
+
         for key, value in self.optionsDict.items():
             if value == '':
+                generation = False
                 self.logger.warning(f"The option {key} can't be empty")
-        if self.optionsDict['type'] == 'bind_agent':
-            bind_agent.writeAgent(
-                self.optionsDict['outfile'],
-                self.optionsDict['address'],
-                self.optionsDict['port'],
-                self.optionsDict['password']
-            )
+
+        if generation is True:
             
+            if self.optionsDict['type'] == 'bind_agent':
+                bind_agent.writeAgent(
+                    self.optionsDict['outfile'],
+                    self.optionsDict['address'],
+                    self.optionsDict['port'],
+                    self.optionsDict['password']
+                )
+                
 
     def do_options(self, arg):
         """Show currents settings of handler"""
