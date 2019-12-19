@@ -51,7 +51,7 @@ def encrypt_message(password, message):
 
         return encrypted.decode()
     
-    except Exception as error:
+    except InvalidToken as error:
         logger.warning(f'[!] An error occured during message encryption : {error}')
 
 
@@ -87,7 +87,7 @@ def decrypt_message(password, message):
 
         return decrypted.decode()
 
-    except Exception as error:
+    except InvalidToken as error:
         logger.warning(f'[!] An error occured during message decryption : {error}')
 
 
