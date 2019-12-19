@@ -1,87 +1,91 @@
 import base64
 import os
+import hashlib
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
+# https://incolumitas.com/2014/10/19/using-the-python-cryptography-module-with-custom-passwords/
 
 
-class Crypto():
-    """Simple class to perform encryption and decryption with Fernet. Initialize with crypto = Crypto('password')"""
 
-    def __init__(self, password):
+def generate_key(password):
+    """Generate fernet key from password"""
+
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(password.encode())
+    key = base64.urlsafe_b64encode(digest.finalize())
+
+    return key
+
+def encrypt_file(password, infile, outfile):
+    """Encrypt file"""
+
+    try:
+
+        fernet = Fernet(generate_key(password))
+
+        with open(infile, 'rb') as fileStream:
+            plainData = fileStream.read()
+
+        with open(outfile, 'wb') as fileStream:
+
+            encrypted = fernet.encrypt(plainData)
+            fileStream.write(encrypted)
+            
+    except Exception as error:
+        print(error)
+
+
+def encrypt_message(password, message):
+    """Encrypt a message with str type and return message as str encrypted"""
     
-        self.salt = os.urandom(16)
-        self.password = password
+    fernet = Fernet(generate_key(password))
 
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=self.salt,
-            iterations=100000,
-            backend=default_backend()
-        )
+    message = message.encode()
+    encrypted = fernet.encrypt(message)
 
-        self.key = base64.urlsafe_b64encode(kdf.derive(self.password.encode()))
-        self.fernet = Fernet(self.key)
-
-
-    def encrypt_file(self, infile, outfile):
-        """Encrypt file"""
-
-        try:
-
-            with open(infile, 'rb') as fileStream:
-                plainData = fileStream.read()
-
-            with open(outfile, 'wb') as fileStream:
-
-                encrypted = self.fernet.encrypt(plainData)
-                fileStream.write(encrypted)
-                
-        except Exception as error:
-            print(error)
-
-
-    def encrypt_message(self, message):
-        """Encrypt a message with str type and return message as str encrypted"""
-        
-        message = message.encode()
-        encrypted = self.fernet.encrypt(message)
-
-        return encrypted.decode()
-        
-    def decrypt_file(self, infile, outfile):
-        """Encrypt file"""
-
-        try:
-
-            with open(infile, 'rb') as fileStream:
-                cipherData = fileStream.read()
-
-            with open(outfile, 'wb') as fileStream:
-
-                decrypted = self.fernet.decrypt(cipherData)
-                fileStream.write(decrypted)
-                
-        except Exception as error:
-            print(error)
-
+    return encrypted.decode()
     
-    def decrypt_message(self, message):
-        """Decrypt a message with str type and return message as str decrypted"""
+def decrypt_file(password, infile, outfile):
+    """Encrypt file"""
 
-        message = message.encode()
-        decrypted = self.fernet.decrypt(message)
+    try:
 
-        return decrypted.decode()
+        fernet = Fernet(generate_key(password))
 
-    def debug(self):
-        """Function to print password and generated key"""
-        
-        print(self.password.decode())
-        print(self.key.decode())
+        with open(infile, 'rb') as fileStream:
+            cipherData = fileStream.read()
 
+        with open(outfile, 'wb') as fileStream:
+
+            decrypted = fernet.decrypt(cipherData)
+            fileStream.write(decrypted)
+            
+    except Exception as error:
+        print(error)
+
+
+def decrypt_message(password, message):
+    """Decrypt a message with str type and return message as str decrypted"""
+
+    fernet = Fernet(generate_key(password))
+
+    message = message.encode()
+    decrypted = fernet.decrypt(message)
+
+    return decrypted.decode()
+
+password = 'Py314!'
+message = 'Hello world !'
+
+encrypted = encrypt_message(password, message)
+decrypted = decrypt_message(password, encrypted)
+
+
+print(message)
+print(encrypted)
+print(decrypted)
 
 
