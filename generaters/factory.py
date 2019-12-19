@@ -1,7 +1,8 @@
 import os
-from generaters import bind_agent
+import logging
 from cmd import Cmd
 from termcolor import colored
+from generaters import bind_agent
 from prettytable import PrettyTable
 
 class Prompt(Cmd):
