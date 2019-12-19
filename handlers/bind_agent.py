@@ -10,7 +10,6 @@ from cmd import Cmd
 from os import system
 from netaddr import ip
 from termcolor import colored
-#from logger import setup_logger
 from prettytable import PrettyTable
 
 
@@ -59,10 +58,12 @@ class Agent(Cmd):
 
     def do_check(self, arg):
 
+        modules.Check(self.channel, self.password)
+        """
         try:
             bufferSize = BUFFER_SIZE
             self.channel.sendall(b'alive ?')
-
+            rawResponse, tempBuffer = b'', b''
             while True:
                 rawResponse = self.channel.recv(bufferSize)
                 # If all data are smaller than the buffer size, break While loop
@@ -76,7 +77,7 @@ class Agent(Cmd):
         except ConnectionResetError:
             logger.warning(f"Channel reset by peer (broken pipe error)")
             return True
-        
+        """
         
     def do_exit(self, arg):
         """Quit agent and close the channel"""
