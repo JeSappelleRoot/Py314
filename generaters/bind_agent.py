@@ -149,7 +149,7 @@ def serverHandler(channel, password):
 
             
             if clientRequest.split(' ')[0] == 'cd':
-                if len(clientRequest.split(' ')) > 2:
+                if len(clientRequest.split(' ')) > 1:
                     workingDir = clientRequest.split(' ')[1]
                     if os.path.isdir(workingDir):
                         os.chdir(workingDir)
