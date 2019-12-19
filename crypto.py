@@ -1,6 +1,7 @@
-import base64
 import os
+import base64
 import hashlib
+import logging
 from cryptography.fernet import Fernet, InvalidToken, InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -35,19 +36,26 @@ def encrypt_file(password, infile, outfile):
             fileStream.write(encrypted)
             
     except Exception as error:
-        print(error)
+        logger.warning(f"An error occured during file encryption : {error}")
 
 
 def encrypt_message(password, message):
     """Encrypt a message with str type and return message as str encrypted"""
     
-    fernet = Fernet(generate_key(password))
+    try:
 
-    message = message.encode()
-    encrypted = fernet.encrypt(message)
+        fernet = Fernet(generate_key(password))
 
-    return encrypted.decode()
+        message = message.encode()
+        encrypted = fernet.encrypt(message)
+
+        return encrypted.decode()
     
+    except Exception as error:
+        logger.warning(f'[!] An error occured during message encryption : {error}')
+
+
+
 def decrypt_file(password, infile, outfile):
     """Encrypt file"""
 
@@ -64,7 +72,7 @@ def decrypt_file(password, infile, outfile):
             fileStream.write(decrypted)
             
     except Exception as error:
-        print(error)
+        logger.warning(f"An error occured during file decryption : {error}")
 
 
 def decrypt_message(password, message):
@@ -80,8 +88,8 @@ def decrypt_message(password, message):
         return decrypted.decode()
 
     except Exception as error:
-        print(f'[!] An error occured during decryption : {error}')
+        logger.warning(f'[!] An error occured during message decryption : {error}')
 
 
-
+logger = logging.getLogger('main')
 
