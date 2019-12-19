@@ -1,5 +1,6 @@
 
 import sys
+import logging
 
 
 def writeAgent(output, rhost, rport, password):
@@ -291,15 +292,20 @@ while True:
         password
     )
 
-
     try:
 
         with open(output, 'w') as fileStream:
             fileStream.write(agent)
 
-        print(f"[+] Agent successfully write to {output}")
+        logger.info(f"Agent successfully write to {output}")
 
     except Exception as error:
-        print(f"[!] An error occured when trying to write agent : ")
+        logger.warning(f"An error occured when trying to write agent : ")
         print(error)
 
+# --------------------------------------------------------------------
+# --------------------------- Main -----------------------------------
+# --------------------------------------------------------------------
+
+
+logger = logging.getLogger('main')
