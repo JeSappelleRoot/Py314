@@ -18,6 +18,9 @@ def generate_key(password):
     digest.update(password.encode())
     key = base64.urlsafe_b64encode(digest.finalize())
 
+    logger.debug(f"Password to generate key : {passowrd}")
+    logger.debug(f"Key generated : {key}")
+
     return key
 
 def encrypt_file(password, infile, outfile):
@@ -30,10 +33,13 @@ def encrypt_file(password, infile, outfile):
         with open(infile, 'rb') as fileStream:
             plainData = fileStream.read()
 
-        with open(outfile, 'wb') as fileStream:
+        with open(outfile, 'xb') as fileStream:
 
             encrypted = fernet.encrypt(plainData)
             fileStream.write(encrypted)
+
+        logger.debug(f"Source file for encryption : {infile}")
+        logger.debug(f"Destination for encryption : {outfile}")
             
     except Exception as error:
         logger.warning(f"An error occured during file encryption : {error}")
@@ -48,6 +54,9 @@ def encrypt_message(password, message):
 
         message = message.encode()
         encrypted = fernet.encrypt(message)
+
+        logger.debug(f"Message before encryption : {message}")
+        logger.debug(f"Message after encryption : {encrypted.decode()}")
 
         return encrypted.decode()
     
@@ -70,6 +79,9 @@ def decrypt_file(password, infile, outfile):
 
             decrypted = fernet.decrypt(cipherData)
             fileStream.write(decrypted)
+
+        logger.debug(f"Source file for decryption : {infile}")
+        logger.debug(f"Destination for decryption : {outfile}")
             
     except Exception as error:
         logger.warning(f"An error occured during file decryption : {error}")
@@ -84,6 +96,9 @@ def decrypt_message(password, message):
 
         message = message.encode()
         decrypted = fernet.decrypt(message)
+
+        logger.debug(f"Message before decryption : {message}")
+        logger.debug(f"Message after decryption : {decrypted.decode()}")
 
         return decrypted.decode()
 
