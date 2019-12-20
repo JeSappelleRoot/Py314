@@ -39,6 +39,9 @@ def Send(channel, password, source, destination):
     logger = logging.getLogger('main')
     logger.debug('< Send module >')
 
+    logger.debug(f"Channel given : {channel}")
+    logger.debug(f"Password given : {password}")
+
 
 
 
@@ -50,6 +53,9 @@ def Shell(channel, password, command):
     logger = logging.getLogger('main')
     logger.debug('< Shell module  >')
 
+    logger.debug(f"Channel given : {channel}")
+    logger.debug(f"Password given : {password}")
+    
     # Define a buffer size, 1024 bytes
     bufferSize = 4096
 
