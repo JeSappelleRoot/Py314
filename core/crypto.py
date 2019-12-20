@@ -18,7 +18,7 @@ def generate_key(password):
     digest.update(password.encode())
     key = base64.urlsafe_b64encode(digest.finalize())
 
-    logger.debug(f"Password to generate key : {passowrd}")
+    logger.debug(f"Password to generate key : {password}")
     logger.debug(f"Key generated : {key}")
 
     return key
