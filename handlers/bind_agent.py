@@ -7,7 +7,7 @@ import logging
 import hashlib
 import threading
 from cmd import Cmd
-from os import system
+from os import system, path
 from netaddr import ip
 from termcolor import colored
 from prettytable import PrettyTable
@@ -42,6 +42,40 @@ class Agent(Cmd):
         command entered.
 
         """
+
+
+    def do_help(self, arg):
+        """Display help about commands"""
+
+        names = self.get_names()
+        commands = [names.replace('do_', '') for names in names if names.startswith('do_')]
+        
+        if arg:
+            
+            doc = getattr(self, 'do_' + arg).__doc__
+            print(doc)
+            
+        elif not arg:
+            table = PrettyTable()
+            #table.vertical_char = ' '
+            #table.border = False
+
+            headers = ['command', 'description']
+            table.field_names = headers
+
+            for header in headers:
+                table.align[header] = 'l'
+
+                
+            for option in dir(self):
+                if option.startswith('do_'):
+                    commandName = option.replace('do_', '')
+                    commandDoc = getattr(self, option).__doc__
+
+                    table.add_row([commandName, commandDoc])
+
+            print(table)
+
         
 # < -------------------------- CUSTOM -------------------------- >
 
@@ -65,6 +99,31 @@ class Agent(Cmd):
         """Quit agent and close the channel"""
         self.channel.close()
         return True
+
+    def do_send(self, arg):
+        """Send a file to remote agent"""
+
+        # If arg, separate by space is different from 2 (needs source and destionation path)
+        if len(arg.split(' ')) != 2:
+            logger.warning('Please specify a source and a destination file (on remote host)')
+            logger.debug(f"Arguments : {arg}")
+        else:
+            # Unpack arg, to add infile and outfile
+            source, dst = arg.split(' ')
+            logger.debug(f"Infile : {src}")
+            logger.debug(f"Outfile : {dst}")
+            # If sourcce file doesn't exist
+            if not path.isfile(src):
+                logger.warning("Source file doesn't exist, please check source path")
+            # Else if 
+            elif path.isdir(src):
+                logger.warning("Source file can't be folder, please check source path")
+            
+            else:
+                modules.Send(self.channel, self.password, src, dst)
+
+            
+
 
     def do_status(self, arg):
         """Display information about open channel with agent"""
