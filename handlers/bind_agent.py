@@ -101,7 +101,7 @@ class Agent(Cmd):
         return True
 
     def do_send(self, arg):
-        """Send a file to remote agent"""
+        """Send a file to remote agent (destination must be a directory)"""
 
         # If arg, separate by space is different from 2 (needs source and destionation path)
         if len(arg.split(' ')) != 2:
