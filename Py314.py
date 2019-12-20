@@ -7,7 +7,7 @@ from cmd import Cmd
 from termcolor import colored
 from handlers import bind_agent
 from generaters import factory
-from logger import setup_logger
+from core.logger import setup_logger
 
 
 def displayBanner():

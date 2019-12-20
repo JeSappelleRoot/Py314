@@ -1,5 +1,5 @@
 
-import crypto
+import core.crypto as crypto
 import logging
 
 def Check(channel, password):
