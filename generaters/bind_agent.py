@@ -182,9 +182,9 @@ def serverHandler(channel, password):
             channel.close()
             exit()
 
-        except Exception as error:
-            logging.warning(f"{{error}}")
-            exit()
+        #except Exception as error:
+        #    logging.warning(f"{{error}}")
+        #    exit()
 
     
 
@@ -236,8 +236,10 @@ if len(sys.argv) > 1:
         level = logging.INFO
     elif verbose == '-vv':
         level = logging.DEBUG
+else:
+    level = logging.CRITICAL
 
-    logging.basicConfig(level=level, format='[%(asctime)s]-[%(levelname)s] : %(message)s', datefmt='%H:%M:%S')
+logging.basicConfig(level=level, format='[%(asctime)s]-[%(levelname)s] : %(message)s', datefmt='%H:%M:%S')
 
 
 bindPort = {}
@@ -280,7 +282,7 @@ while True:
         
         
     except Exception as error:
-        logging.warning(f"{{error}}")
+        #logging.warning(f"{{error}}")
         serverSocket.close()
         exit()
 
