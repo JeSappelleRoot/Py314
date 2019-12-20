@@ -36,7 +36,7 @@ def Check(channel, password):
 
 
 def Send(channel, password, source, destination):
-    """Send a file to remote agent"""
+    """Send a file to remote agent, destination must be a directory"""
 
     try:
 
@@ -46,7 +46,8 @@ def Send(channel, password, source, destination):
         logger.debug(f"Channel given : {channel}")
         logger.debug(f"Password given : {password}")
         logger.debug(f"Source file given : {source}")
-        logger.debug(f"Destination file given : {destination}")
+        logger.debug(f"Basename of given file : {os.path.basename(source)}")
+        logger.debug(f"Destination folder given : {destination}")
 
         homeFolder = os.environ['HOME']
         py314Folder = f"{homeFolder}/.Py314"
@@ -69,9 +70,17 @@ def Send(channel, password, source, destination):
             if len(agentAnswer) < bufferSize:
                 logger.debug('break recv while loop')
                 break
+        
+        decryptedAnswer = crypto.decrypt_message(password, agentAnswer.decode())
+        logger.debug(f"Agent answer : {decryptedAnswer}")
+        if decryptedAnswer == '!':
+            logger.info(f"Remote directory {destination} doesn't exist")
+        elif decryptedAnswer == 'ready':
+            logger.debug('Agent is ready for file transfer')
+        
 
 
-
+        os.remove(tempFile)
 
 
 
