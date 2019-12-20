@@ -110,8 +110,6 @@ class Agent(Cmd):
         else:
             # Unpack arg, to add infile and outfile
             src, dst = arg.split(' ')
-            logger.debug(f"Infile : {src}")
-            logger.debug(f"Outfile : {dst}")
             
             # If source file is a directory
             if path.isdir(src):
@@ -120,6 +118,7 @@ class Agent(Cmd):
             elif not path.isfile(src):
                 logger.warning("Source file doesn't exist, please check source path")
             else:
+                logger.debug('Arguments are corrects, sended to Send module')
                 modules.Send(self.channel, self.password, src, dst)
 
             
