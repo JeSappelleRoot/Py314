@@ -33,6 +33,14 @@ def Check(channel, password):
         return True
 
 
+def Send(channel, password, source, destination):
+    """Send a file to remote agent"""
+
+    logger = logging.getLogger('main')
+    logger.debug('< Send module >')
+
+
+
 
 
 def Shell(channel, password, command):
@@ -40,8 +48,7 @@ def Shell(channel, password, command):
 # Module to send a shell command to remote agent
 
     logger = logging.getLogger('main')
-
-    #crypto = Crypto(password)
+    logger.debug('< Shell module  >')
 
     # Define a buffer size, 1024 bytes
     bufferSize = 4096
