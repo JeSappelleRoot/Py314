@@ -35,8 +35,8 @@ def Check(channel, password):
         return True
 
 
-def Send(channel, password, source, destination):
-    """Send a file to remote agent, destination must be a directory"""
+def Upload(channel, password, source, destination):
+    """Upload a file to remote agent, destination must be a directory"""
 
     try:
 
