@@ -53,7 +53,7 @@ def Upload(channel, password, source, destination):
         tempFile = f"{py314Folder}/temp.crypt"
         logger.debug(f"Temporary encrypted file : {tempFile}")
 
-        crypto.encrypt_file(password, source, tempFile)
+        
 
         message = f"send {source} {destination}"
         encryptedMessage = crypto.encrypt_message(password, message)
@@ -72,16 +72,23 @@ def Upload(channel, password, source, destination):
         
         decryptedAnswer = crypto.decrypt_message(password, agentAnswer.decode())
         logger.debug(f"Agent answer : {decryptedAnswer}")
+
         if decryptedAnswer == '!':
             logger.info(f"Remote directory {destination} doesn't exist")
+
         elif decryptedAnswer == 'ready':
             logger.debug('Agent is ready for file transfer')
+
+            crypto.encrypt_file(password, source, tempFile)
+
+            with open(tempFile, 'rb') as fileStream:
+                
+                binaryData = fileStream.read()
+                channel.sendall(binaryData)
         
-
-
-        os.remove(tempFile)
-
-
+            os.remove(tempFile)
+            logger.debug(f"File {tempFile} removed")
+            logger.info(f"File {source} successfully uploaded")
 
     except Exception as error:
         logger.warning('An error occured during sending file : ')
