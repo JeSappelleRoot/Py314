@@ -100,8 +100,8 @@ class Agent(Cmd):
         self.channel.close()
         return True
 
-    def do_send(self, arg):
-        """Send a file to remote agent (destination must be a directory)"""
+    def do_upload(self, arg):
+        """Upload a file to remote agent (destination must be a directory)"""
 
         # If arg, separate by space is different from 2 (needs source and destionation path)
         if len(arg.split(' ')) != 2:
