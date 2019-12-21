@@ -119,7 +119,7 @@ class Agent(Cmd):
                 logger.warning("Source file doesn't exist, please check source path")
             else:
                 logger.debug('Arguments are corrects, sended to Send module')
-                modules.Send(self.channel, self.password, src, dst)
+                modules.Upload(self.channel, self.password, src, dst)
 
             
 
@@ -354,8 +354,9 @@ def bindAgent(dictionnary):
             else:
                 pass
 
-    except ConnectionError:
+    except ConnectionError as error:
         logger.info(f"Can't established connection to {host}")
+        logger.debug(error)
         return
 
     except ConnectionRefusedError as e:
