@@ -278,7 +278,7 @@ if len(sys.argv) > 1:
         logFormat = '[%(asctime)s]-[%(levelname)s] : %(message)s'
     elif verbose == '-vv':
         level = logging.DEBUG
-        logFormat = '[%(asctime)s]-[%(levelname)s] (from %(funcName)s in %(module)s) : %%(message)s'
+        logFormat = '[%(asctime)s]-[%(levelname)s] (from %(funcName)s in %(module)s) : %(message)s'
 
     logging.basicConfig(level=level, format=logFormat, datefmt='%H:%M:%S')
 
