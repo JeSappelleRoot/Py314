@@ -46,24 +46,33 @@ def encrypt_file(password, infile, outfile):
 
             encrypted = fernet.encrypt(plainData)
             fileStream.write(encrypted)
+
+        logging.debug(f"Source file for encryption : {{infile}}")
+        logging.debug(f"Destination for encryption : {{outfile}}")
             
     except Exception as error:
-        logging.warning(error)
+        logging.warning(f"An error occured during file decryption : {{error}}")
 
 
 
 def encrypt_message(password, message):
     """Encrypt a message with str type and return message as str encrypted"""
     
-    fernet = Fernet(generate_key(password))
+    try:
 
-    message = message.encode()
-    encrypted = fernet.encrypt(message)
+        fernet = Fernet(generate_key(password))
 
-    logging.debug(f"Message before encryption : {{message}}")
-    logging.debug(f"Message after encryption : {{encrypted.decode()}}")
+        message = message.encode()
+        encrypted = fernet.encrypt(message)
 
-    return encrypted.decode()
+        logging.debug(f"Message before encryption : {{message}}")
+        logging.debug(f"Message after encryption : {{encrypted.decode()}}")
+
+        return encrypted.decode()
+
+    except Exception as error:
+        logging.warning(f"An error occured during message encryption : {{error}}")
+
     
 def decrypt_file(password, infile, outfile):
     """Encrypt file"""
@@ -79,23 +88,31 @@ def decrypt_file(password, infile, outfile):
 
             decrypted = fernet.decrypt(cipherData)
             fileStream.write(decrypted)
+
+        logging.debug(f"Source file for decryption : {{infile}}")
+        logging.debug(f"Destination for decryption : {{outfile}}")
             
     except Exception as error:
-        logging.warning(error)
+        logging.warning(f"An error occured during file decryption : {{error}}")
 
 
 def decrypt_message(password, message):
     """Decrypt a message with str type and return message as str decrypted"""
 
-    fernet = Fernet(generate_key(password))
+    try:
 
-    message = message.encode()
-    decrypted = fernet.decrypt(message)
+        fernet = Fernet(generate_key(password))
 
-    logging.debug(f"Message before decryption : {{message}}")
-    logging.debug(f"Message after decryption : {{decrypted.decode()}}")
+        message = message.encode()
+        decrypted = fernet.decrypt(message)
 
-    return decrypted.decode()
+        logging.debug(f"Message before decryption : {{message}}")
+        logging.debug(f"Message after decryption : {{decrypted.decode()}}")
+
+        return decrypted.decode()
+
+    except Exception as error:
+        logging.warning(f"An error occured during message decryption : {{error}}")
 
 
 
@@ -140,19 +157,51 @@ def receiveFile(channel, password, request):
     srcBasename = os.path.basename(src)
     dst = request.split(' ')[2]
 
+    dstFile = f"{{dst}}/{{srcBasename}}"
+    tempFile = f"{{dst}}/temp.crypt"
+
     logging.debug(f"Channel : {{channel}}")
     logging.debug(f"Password : {{password}}")
     logging.debug(f"Request : {{request.split(' ')[0]}}")
     logging.debug(f"Wanted filename : {{srcBasename}}")
     logging.debug(f"Destination folder : {{dst}}")
+    logging.debug(f"Temporary file : {{tempFile}}")
+    logging.debug(f"Final file : {{dstFile}}")
 
     if not os.path.isdir(dst):
+        logging.debug(f"Destination folder {{dst}} doesn't exist")
         answer = '!'
+        transfer = False
+
     elif os.path.isdir(dst):
+        logging.debug(f"Destination folder {{dst}} is valid")
         answer = 'ready'
+        transfer = True
 
     encryptedAnswer = encrypt_message(password, answer)
     channel.sendall(encryptedAnswer.encode())
+    logging.debug(f"Sending answer : {{answer}}")
+
+    if transfer is True:
+
+        with open(tempFile, 'ab') as fileStream:
+
+                bufferSize = BUFFER_SIZE
+                rawFile = b''
+                
+                # While loop to complete socket buffer in recv 
+                while True:
+                    rawFile = channel.recv(bufferSize)
+                    fileStream.write(rawFile)
+                    logging.debug(f"Write partial file : {{rawFile}}")
+                    if len(rawFile) < bufferSize:
+                        logging.debug('break recv while loop')
+                        break
+        logging.debug(f"Temporary file successfully written")
+
+        decrypt_file(password, tempFile, dstFile)
+        os.remove(tempFile)
+        logging.debug(f"Temporary file {{tempFile}} deleted")
 
 
 
