@@ -41,7 +41,6 @@ def Upload(channel, password, source, destination):
     try:
 
         logger = logging.getLogger('main')
-        logger.debug('< Send module >')
 
         logger.debug(f"Channel given : {channel}")
         logger.debug(f"Password given : {password}")
@@ -100,7 +99,6 @@ def Shell(channel, password, command):
 # Module to send a shell command to remote agent
 
     logger = logging.getLogger('main')
-    logger.debug('< Shell module  >')
 
     logger.debug(f"Channel given : {channel}")
     logger.debug(f"Password given : {password}")
