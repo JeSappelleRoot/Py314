@@ -197,10 +197,6 @@ class Prompt(Cmd):
         """Quit Py314"""
         exit()
 
-    def do_password(self, arg):
-        password = self.optionsDict['password']
-        cipherPassword = hashlib.sha512(password.encode()).hexdigest()
-
     def do_run(self, arg):
         """Launch handler with defined settings"""
         bindAgent(self.optionsDict)
