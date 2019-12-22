@@ -91,8 +91,31 @@ class Agent(Cmd):
 # < -------------------------- COMMANDS -------------------------- >
 
     def do_check(self, arg):
-
+        """Check if remote agent is alive"""
         modules.Check(self.channel, self.password)
+
+    def do_download(self, arg):
+        """Download a remote file to a local directory : download <remote file> <local directory>"""
+
+        # If arg, separate by space is different from 2 (needs source and destination path)
+        if len(arg.split(' ')) != 2:
+            logger.warning('Please specify a remote file and a local directory')
+            logger.debug(f"Arguments : {arg}")
+
+        else: 
+
+            src, dst = arg.split(' ')
+            
+            if path.isfile(dst):
+                logger.warning("Destination can't be an existing file (must be an existing directory)")
+            elif not path.isdir(dst):
+                logger.warning('Please specify a valid directory for destination')
+
+            else:
+                logger.debug('Arguments are corrects, sended to Download module')
+                modules.Download(self.channel, self.password, src, dst)
+            
+
 
         
     def do_exit(self, arg):
@@ -101,11 +124,11 @@ class Agent(Cmd):
         return True
 
     def do_upload(self, arg):
-        """Upload a file to remote agent (destination must be a directory)"""
+        """Upload a local file to remote directory : upload <source file> <remote directory>"""
 
-        # If arg, separate by space is different from 2 (needs source and destionation path)
+        # If arg, separate by space is different from 2 (needs source and destination path)
         if len(arg.split(' ')) != 2:
-            logger.warning('Please specify a source and a destination file (on remote host)')
+            logger.warning('Please specify a source file and a remote directory')
             logger.debug(f"Arguments : {arg}")
         else:
             # Unpack arg, to add infile and outfile
@@ -287,7 +310,7 @@ class Prompt(Cmd):
 # ------------------------------ Main ------------------------------
 # ------------------------------------------------------------------
 
-BUFFER_SIZE = 4096
+BUFFER_SIZE = 1024
 logger = logging.getLogger('main')
 
 
