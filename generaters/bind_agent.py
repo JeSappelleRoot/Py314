@@ -204,6 +204,45 @@ def receiveFile(channel, password, request):
         logging.debug(f"Temporary file {{tempFile}} deleted")
 
 
+def sendFile(channel, password, request):
+
+    localFile = request.split(' ')[1]
+    parentDir = os.path.dirname(localFile)
+    tempFile = f"{{parentDir}}/temp.crypt"
+
+    logging.debug(f"Channel : {{channel}}")
+    logging.debug(f"Password : {{password}}")
+    logging.debug(f"Request : {{request.split(' ')[0]}}")
+    logging.debug(f"Wanted local file : {{localFile}}")
+    logging.debug(f"Temporary file : {{tempFile}}")
+
+    if not os.path.isfile(localFile):
+        logging.debug(f"Local file for download {{localFile}} doesn't exist")
+        answer = '!'
+        transfer = False
+    elif os.path.isfile(localFile):
+        logging.debug(f"Local file {{localFile}} exist")
+        answer = 'ready'
+        transfer = True
+
+        encrypt_file(password, localFile, tempFile)
+
+    encryptedAnswer = encrypt_message(password, answer)
+    channel.sendall(encryptedAnswer.encode())
+    logging.debug(f"Sending answer : {{answer}}")
+
+
+    if transfer is True:
+
+        with open(tempFile, 'rb') as fileStream:
+            binaryData = fileStream.read()
+            channel.sendall(binaryData)
+    
+        os.remove(tempFile)
+        logging.debug(f"File {{tempFile}} removed")
+
+
+
 
 
 def serverHandler(channel, password):
@@ -255,9 +294,13 @@ def serverHandler(channel, password):
                 encryptedOutput = encrypt_message(password, output)
                 channel.sendall(encryptedOutput.encode())
 
-            # Elif client want to send a file
-            elif clientRequest.split(' ')[0] == 'send':
+            # Elif client want to upload a file
+            elif clientRequest.split(' ')[0] == 'upload':
                 receiveFile(channel, password, clientRequest)
+
+            elif clientRequest.split(' ')[0] == 'download':
+                sendFile(channel, password, clientRequest)
+
             
             # Else execute shell command
             else:
