@@ -107,21 +107,27 @@ class Prompt(Cmd):
 
 def checkConfig():
 
-
+    # Get ~ directory
     homeFolder = os.environ['HOME']
+    # Define Py314 folder
     py314Folder = f"{homeFolder}/.Py314"
     
+    # If Py314 hidden directory doesn't exist, create it
     if not os.path.isdir(py314Folder):
-        print(f"[!] Folder {py314Folder} doesn't exist")
-        print(f'[!] It will be created ')
+        logger.info(f"[!] Folder {py314Folder} doesn't exist")
+        logger.info(f'[!] It will be created ')
         os.makedirs(py314Folder)
 
     return
 
 def checkLevel(args):
+    """Function to check logging module level in argument"""
 
+
+    # If command line arg = '-v', launch Py314 in debug mode
     if len(args) > 1 and args[1] == '-v':
         level = logging.DEBUG
+    # Else, launch Py314 in regular mode (INFO logging level)
     else:
         level = logging.INFO
 
@@ -131,7 +137,7 @@ def checkLevel(args):
 
 try:
 
-
+    # Define a logger, with 'main' name
     logger = setup_logger('main')
     logger.setLevel(checkLevel(sys.argv))
     
