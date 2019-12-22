@@ -9,27 +9,37 @@ def Check(channel, password):
 
     try:
 
+        # Get main logger, define in core.logger
         logger = logging.getLogger('main')
 
+        # Define a buffer size
         bufferSize = 4096
+        # Encrypt 'alive ?' message with symmetric key
         checkMessage = crypto.encrypt_message(password, 'alive ?').encode()
+        # Send encrypted message
         channel.sendall(checkMessage)
+        # Define rawResponse and a temporary buffer
         rawResponse, tempBuffer = b'', b''
 
+        # While true (while receiving data)
         while True:
-
+            # Temporary buffer receive data
             tempBuffer = channel.recv(bufferSize)
+            # Add these data to rawResponse
             rawResponse += tempBuffer
             
-            # If all data are smaller than the buffer size, break While loop
+            # If data in temporary buffer are smaller than the buffer size, break While loop
+            # 'cause, no more data
             if len(tempBuffer) < bufferSize:
                 break
-        # Decode bytes to string to read the answer of the remote agent
 
+        # Decode answer with crypto module
         checkAnswer = crypto.decrypt_message(password, rawResponse.decode())
+        # If agent answer is 'alive !', log info 
         if checkAnswer == 'alive !':
             logger.info(f"Agent is alive")
 
+    # ConnectionResetError is raise if channel (socket) is unavailable
     except ConnectionResetError:
         logger.warning(f"Channel reset by peer (broken pipe error)")
         return True
@@ -40,28 +50,36 @@ def Upload(channel, password, source, destination):
 
     try:
 
+        # Get the main logger, defined in logger module
         logger = logging.getLogger('main')
 
+        # Some debug
         logger.debug(f"Channel given : {channel}")
         logger.debug(f"Password given : {password}")
         logger.debug(f"Source file given : {source}")
         logger.debug(f"Basename of given file : {os.path.basename(source)}")
         logger.debug(f"Destination folder given : {destination}")
 
+        # Get ~ directory
         homeFolder = os.environ['HOME']
+        # Define Py314 hidden directory
         py314Folder = f"{homeFolder}/.Py314"
+        # Define a temporary file
         tempFile = f"{py314Folder}/temp.crypt"
+        # Some debug here
         logger.debug(f"Temporary encrypted file : {tempFile}")
 
         
-
+        # Craft a first message, with source file and destination directory
         message = f"send {source} {destination}"
+        # Encrypt message with symmetric key
         encryptedMessage = crypto.encrypt_message(password, message)
-
+        # Then, send this first message
         channel.sendall(encryptedMessage.encode())
+    
+        # Define a empty agentAnswer and a buffer size
+        agentAnswer, bufferSize = b'', 4096
 
-        bufferSize = 4096
-        agentAnswer = b''
         # While True, receive data
         while True:
             logger.debug('Waiting for agent answer about transfer...')
@@ -69,23 +87,26 @@ def Upload(channel, password, source, destination):
             if len(agentAnswer) < bufferSize:
                 logger.debug('break recv while loop')
                 break
-        
+        # Decrypt agent answer
         decryptedAnswer = crypto.decrypt_message(password, agentAnswer.decode())
         logger.debug(f"Agent answer : {decryptedAnswer}")
 
+        # If agent's answer is '!', the remote directory doesn't exist
         if decryptedAnswer == '!':
             logger.info(f"Remote directory {destination} doesn't exist")
 
+        # Else if agent say 'ready', continue the upload request
         elif decryptedAnswer == 'ready':
             logger.debug('Agent is ready for file transfer')
-
+            # Encrypt file with crypto module
             crypto.encrypt_file(password, source, tempFile)
-
+            # With statement to open file in Read Binary mode
             with open(tempFile, 'rb') as fileStream:
                 
+                # Assign data, and use sendall() through socket
                 binaryData = fileStream.read()
                 channel.sendall(binaryData)
-        
+            # Finally remove temporary encrypted file
             os.remove(tempFile)
             logger.debug(f"File {tempFile} removed")
             logger.info(f"File {source} successfully uploaded")
@@ -95,12 +116,6 @@ def Upload(channel, password, source, destination):
         logger.warning(error)
         
     
-
-
-
-
-
-
 def Shell(channel, password, command):
     """Try to interact with remote agent with a shell"""
 # Module to send a shell command to remote agent
