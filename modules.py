@@ -5,7 +5,7 @@ import core.crypto as crypto
 
 
 def Check(channel, password):
-
+    """Perform a remote agent checking"""
 
     try:
 
