@@ -121,8 +121,6 @@ class Agent(Cmd):
                 logger.debug('Arguments are corrects, sended to Send module')
                 modules.Upload(self.channel, self.password, src, dst)
 
-            
-
 
     def do_status(self, arg):
         """Display information about open channel with agent"""
