@@ -14,6 +14,8 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 def generate_key(password):
     """Generate fernet key from password"""
 
+    logger = logging.getLogger('main')
+
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
     digest.update(password.encode())
     key = base64.urlsafe_b64encode(digest.finalize())
@@ -28,6 +30,7 @@ def encrypt_file(password, infile, outfile):
 
     try:
 
+        logger = logging.getLogger('main')
         fernet = Fernet(generate_key(password))
 
         with open(infile, 'rb') as fileStream:
@@ -50,6 +53,7 @@ def encrypt_message(password, message):
     
     try:
 
+        logger = logging.getLogger('main')
         fernet = Fernet(generate_key(password))
 
         message = message.encode()
@@ -70,6 +74,7 @@ def decrypt_file(password, infile, outfile):
 
     try:
 
+        logger = logging.getLogger('main')
         fernet = Fernet(generate_key(password))
 
         with open(infile, 'rb') as fileStream:
@@ -92,6 +97,7 @@ def decrypt_message(password, message):
 
     try:
 
+        logger = logging.getLogger('main')
         fernet = Fernet(generate_key(password))
 
         message = message.encode()
@@ -106,5 +112,4 @@ def decrypt_message(password, message):
         logger.warning(f'[!] An error occured during message decryption : {error}')
 
 
-logger = logging.getLogger('main')
-
+#logger = logging.getLogger('main')
