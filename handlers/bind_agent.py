@@ -105,12 +105,15 @@ class Agent(Cmd):
         else: 
 
             src, dst = arg.split(' ')
+            fileBasename = path.basename(src)
+            finalFile = f"{dst}/{fileBasename}"
             
             if path.isfile(dst):
                 logger.warning("Destination can't be an existing file (must be an existing directory)")
+            elif path.isfile(finalFile):
+                logger.warning(f"File {finalFile} already exist !")
             elif not path.isdir(dst):
                 logger.warning('Please specify a valid directory for destination')
-
             else:
                 logger.debug('Arguments are corrects, sended to Download module')
                 modules.Download(self.channel, self.password, src, dst)
