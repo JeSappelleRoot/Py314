@@ -1,12 +1,14 @@
 import sys
 import glob
 import time
-import socket
+#import socket
+import socks
 import modules
 import logging
 import hashlib
 import threading
 from cmd import Cmd
+from core.channels import bind_tcp
 from os import system, path
 from netaddr import ip
 from termcolor import colored
@@ -342,10 +344,18 @@ def bindAgent(dictionnary):
         #print(f"[+] Trying to connect to {host}:{port}")
         logger.info(f"Trying to connect to {host}:{port}")
 
-        channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        #channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        #channel.connect((host, port))
 
-        channel.connect((host, port))
+        #channel = socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
+        #channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        bind_tcp(host, port, proxy)
+
+
+        exit()
+
         challenge = passwordChallenge(channel, ciperPassword)
 
 
