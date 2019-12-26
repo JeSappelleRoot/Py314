@@ -131,7 +131,7 @@ def passwordChallenge(channel, passwd):
     # Decode bytes to str
     hashPassword = rawHashPassword.decode()
 
-    logging.debug(f"Password used for password channel : {{password}}")
+    logging.debug(f"Password used for password challenge : {{password}}")
     logging.debug(f"Generated SHA512 : {{ciperPassword}}")
     logging.debug(f"Received SHA512 : {{hashPassword}}")
     
@@ -246,9 +246,6 @@ def sendFile(channel, password, request):
 
 
 def serverHandler(channel, password):
-
-    #crypto = Crypto(password)
-
 
     # Loop on socket.recv
     while True:
