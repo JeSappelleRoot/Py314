@@ -350,12 +350,11 @@ def bindAgent(dictionnary):
 
 
         if challenge is True:
-            logger.info(f"Connection established to {host}:{port}")
             logger.debug(f'Successfull password challenge with : ')
             logger.debug(f'Password > {password}')
             logger.debug(f'SHA512 > {ciperPassword}')
         elif challenge is False:
-            logger.info(f"[!] Password doesn't match")
+            logger.warning(f"[!] Password doesn't match")
             channel.close()
             return
 
