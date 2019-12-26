@@ -71,12 +71,12 @@ def bind_tcp(ip, port, proxy):
             logger.debug('Proxy is valid, will be use for connection')
             channel.set_proxy(proxy_type=proxyOpt[0], addr=proxyOpt[1], port=proxyOpt[2])
         else:
+            logger.debug('Proxy is invalid, connection aborted')
             return False
 
 
     try:
 
-        logger.info(f"Try to established connection to {ip}:{port}")
         channel.connect((ip, port))
         logger.info(f"Channel successfully established with remote agent")
 
