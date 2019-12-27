@@ -384,21 +384,9 @@ port = {}
 password = '{}'
 ciperPassword = hashlib.sha512(password.encode()).hexdigest()
 
-#serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-#serverSocket.bind((bindAddress, bindPort))
-#serverSocket.listen(5)
-
-#logging.info(f"Listening on {{bindAddress}}:{{bindPort}}")
-#print(f"[?] Listening on {{bindAddress}}:{{bindPort}}")
-
 
 try:
 
-    #channel, cliAddress = serverSocket.accept()
-    #logging.info(f"Received Connection from {{cliAddress[0]}}")
-    
     channel = ConnectPy314(ip, port)
     
     challenge, receivedHash = passwordChallenge(channel, password)
@@ -410,15 +398,12 @@ try:
 
 
 except KeyboardInterrupt:
-    #serverSocket.close()
     channel.close()
     exit()
     
     
 except Exception as error:
     logging.warning(f"{{error}}")
-    #serverSocket.close()
-    #channel.close()
     exit()
 
  
