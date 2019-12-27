@@ -138,8 +138,8 @@ def checkLevel(args):
 try:
 
     # Define a logger, with 'main' name
-    logger = setup_logger('main')
-    logger.setLevel(checkLevel(sys.argv))
+    level = checkLevel(sys.argv)
+    logger = setup_logger('main', level)
     
     checkConfig()
     displayBanner()
