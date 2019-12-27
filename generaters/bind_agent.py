@@ -423,10 +423,10 @@ while True:
         with open(output, 'w') as fileStream:
             fileStream.write(agent)
 
-        logger.info(f"Agent successfully write to {output}")
+        logger.success(f"Agent successfully write to {output}")
 
     except Exception as error:
-        logger.warning(f"An error occured when trying to write agent : ")
+        logger.failure(f"An error occured when trying to write agent : ")
         print(error)
 
 # --------------------------------------------------------------------
