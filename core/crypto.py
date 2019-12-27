@@ -53,7 +53,7 @@ def encrypt_file(password, infile, outfile):
         logger.debug(f"Destination for encryption : {outfile}")
             
     except Exception as error:
-        logger.failure(f"An error occured during file encryption : {error}")
+        logger.warning(f"An error occured during file encryption : {error}")
 
 
 def encrypt_message(password, message):
@@ -77,7 +77,7 @@ def encrypt_message(password, message):
         return encrypted.decode()
     
     except InvalidToken as error:
-        logger.failure(f'An error occured during message encryption : {error}')
+        logger.warning(f'An error occured during message encryption : {error}')
 
 
 
@@ -105,7 +105,7 @@ def decrypt_file(password, infile, outfile):
         logger.debug(f"Destination for decryption : {outfile}")
             
     except Exception as error:
-        logger.failure(f"An error occured during file decryption : {error}")
+        logger.warning(f"An error occured during file decryption : {error}")
 
 
 def decrypt_message(password, message):
@@ -128,5 +128,5 @@ def decrypt_message(password, message):
         return decrypted.decode()
 
     except InvalidToken as error:
-        logger.failure(f'An error occured during message decryption : {error}')
+        logger.warning(f'An error occured during message decryption : {error}')
 
