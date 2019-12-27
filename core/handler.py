@@ -8,7 +8,7 @@ import logging
 import hashlib
 import threading
 from cmd import Cmd
-from netaddr import IPAddress
+from netaddr import IPAddress, IPNetwork, AddrFormatError
 from core import channels
 from os import system, path
 from termcolor import colored
@@ -30,11 +30,11 @@ class Agent(Cmd):
             modules.Shell(self.channel, self.password, cmd)
 
         except ConnectionResetError:
-            logger.failure(f"Channel reset by peer")
+            logger.warning(f"Channel reset by peer")
             return True
 
         except BrokenPipeError:
-            logger.failure(f"Channel reset by peer (broken pipe error)")
+            logger.warning(f"Channel reset by peer (broken pipe error)")
             return True
 
     def emptyline(self):
@@ -99,7 +99,7 @@ class Agent(Cmd):
 
         # If arg, separate by space is different from 2 (needs source and destination path)
         if len(arg.split(' ')) != 2:
-            logger.failure('Please specify a remote file and a local directory')
+            logger.warning('Please specify a remote file and a local directory')
             logger.debug(f"Arguments : {arg}")
 
         else: 
@@ -109,11 +109,11 @@ class Agent(Cmd):
             finalFile = f"{dst}/{fileBasename}"
             
             if path.isfile(dst):
-                logger.failure("Destination can't be an existing file (must be an existing directory)")
+                logger.warning("Destination can't be an existing file (must be an existing directory)")
             elif path.isfile(finalFile):
-                logger.failure(f"File {finalFile} already exist !")
+                logger.warning(f"File {finalFile} already exist !")
             elif not path.isdir(dst):
-                logger.failure('Please specify a valid directory for destination')
+                logger.warning('Please specify a valid directory for destination')
             else:
                 logger.debug('Arguments are corrects, sended to Download module')
                 modules.Download(self.channel, self.password, src, dst)
@@ -131,7 +131,7 @@ class Agent(Cmd):
 
         # If arg, separate by space is different from 2 (needs source and destination path)
         if len(arg.split(' ')) != 2:
-            logger.failure('Please specify a source file and a remote directory')
+            logger.warning('Please specify a source file and a remote directory')
             logger.debug(f"Arguments : {arg}")
         else:
             # Unpack arg, to add infile and outfile
@@ -139,10 +139,10 @@ class Agent(Cmd):
             
             # If source file is a directory
             if path.isdir(src):
-                logger.failure("Source file can't be folder, please check source path")
+                logger.warning("Source file can't be folder, please check source path")
             # Else if sourcce file doesn't exist
             elif not path.isfile(src):
-                logger.failure("Source file doesn't exist, please check source path")
+                logger.warning("Source file doesn't exist, please check source path")
             else:
                 logger.debug('Arguments are corrects, sended to Send module')
                 modules.Upload(self.channel, self.password, src, dst)
@@ -233,12 +233,12 @@ class Prompt(Cmd):
             value = arg.split(' ')[1]
 
             if option not in availableOptions:
-                logger.failure(f"Option {option} can't be set with this handler")
+                logger.warning(f"Option {option} can't be set with this handler")
             else:
                 self.optionsDict[option] = value
                 logger.debug(f'Option <{option}> set to <{value}>')
         else:
-            logger.failure(f'Please specify an <option> and a associated <value>')
+            logger.warning(f'Please specify an <option> and a associated <value>')
 
 
 
@@ -269,7 +269,7 @@ class Prompt(Cmd):
         """Unset value for available option : unset <option>"""
 
         if len(arg.split(' ')) > 1 or len(arg.split(' ')) < 1:
-            self.logger.failure(f"Please specify unset <option>")
+            self.logger.warning(f"Please specify unset <option>")
         
         else:
 
@@ -277,7 +277,7 @@ class Prompt(Cmd):
             option = arg.split(' ')[0]
 
             if option not in availableOptions:
-                logger.failure(f"Option {option} can't be unset")
+                logger.warning(f"Option {option} can't be unset")
             else:
                 self.optionsDict[option] = ''
 
@@ -325,7 +325,8 @@ def startModule():
 def ConnectAgent(dictionnary):
 
 
-    checkOptions(dictionnary)
+    if checkOptions(dictionnary) is False:
+        return
 
 
 
@@ -360,7 +361,7 @@ def ConnectAgent(dictionnary):
             logger.debug(f'Password > {password}')
             logger.debug(f'SHA512 > {ciperPassword}')
         elif challenge is False:
-            logger.failure(f"Password doesn't match")
+            logger.warning(f"Password doesn't match")
             channel.close()
             return
 
@@ -385,7 +386,7 @@ def ConnectAgent(dictionnary):
 
 
     except OSError as error:
-        logger.failure(error)
+        logger.warning(error)
         return
 
 
@@ -419,12 +420,12 @@ def checkAgent(channel, objet):
             channel.sendall(b'alive ?')
 
         except ConnectionResetError:
-            logger.failure(f"Channel reset by peer")
+            logger.warning(f"Channel reset by peer")
             objet.do_exit()
             break
 
         except BrokenPipeError:
-            logger.failure(f"\nChannel reset by peer (broken pipe error)")
+            logger.warning(f"\nChannel reset by peer (broken pipe error)")
             objet.exit_prompt
             break
         
@@ -437,22 +438,42 @@ def checkOptions(dictionnary):
 
     logger.debug(f"Dictionnary items : {dictionnary}")
     handlerType = ['bind_agent', 'reverse_listener']
+    valid = True
 
     try:
         ip = IPAddress(dictionnary['host'])
         port = int(dictionnary['port'])
         handler = dictionnary['type']
+        proxy = dictionnary['proxy']
+        password = dictionnary['password']
 
-        hander is in handlerType
+        if ip.version != 4:
+            logger.warning(f"IPv6 is not supported by Py314")
+            valid = False
+        elif dictionnary['host'].split('.')[-1].startswith('0'):
+            logger.warning(f"Invalid IP address for host : {dictionnary['host']}")
+            valid = False
 
+        if port <= 0 or port > 65535:
+            logger.warning(f"Port number must be between 1 and 65535")
+            valid = False
 
+        if handler not in handlerType:
+            logger.warning(f"Please specify a valid handler : {', '.join(handlerType)}")
+            valid = False
 
-    except Exception as error:
-        logger.warning(str(error).capitalize())
+        if handler == 'reverse_listener' and proxy != '':
+            logger.warning('Proxy set with reverse_listener : proxy will be ignored')
+
+    except AddrFormatError as error:
+        logger.warning(f"Invalid IP address for host : {dictionnary['host']}")
+        valid = False
     
+    except ValueError as error:
+        logger.warning(f"Invalid port number : {dictionnary['port']}")
+        valid = False
 
-    exit()
-
+    return valid
 
 
 
