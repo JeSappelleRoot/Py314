@@ -276,7 +276,6 @@ class Prompt(Cmd):
 
             availableOptions = [options.replace('set_', '') for options in dir(self) if options.startswith('set_')]
             option = arg.split(' ')[0]
-            #value = arg.split(' ')[1]
 
             if option not in availableOptions:
                 logger.failure(f"Option {option} can't be unset")
