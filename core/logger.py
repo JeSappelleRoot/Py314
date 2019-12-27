@@ -1,6 +1,7 @@
 import sys
 import coloredlogs
 import logging
+from termcolor import colored
 
 class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
@@ -9,7 +10,6 @@ class CustomFormatter(logging.Formatter):
     defaultFormat = '[%(asctime)s]-[%(levelname)s] : %(message)s'
     debugFormat = '[%(asctime)s]-[%(levelname)s] (from %(funcName)s in %(module)s) : %(message)s'
     
-
     FORMATS = {
         logging.DEBUG: debugFormat,
         logging.INFO: defaultFormat,
@@ -24,21 +24,41 @@ class CustomFormatter(logging.Formatter):
 
         return formatter.format(record)
 
-def setup_logger(name):
 
-    level = logging.INFO
+def setup_logger(name, level):
 
-    # Add [from %(funcName)s in %(module)s] in debug level (specify a formatter for differents level)
+    #level = logging.INFO
 
-    #formatter = logging.Formatter('[%(asctime)s]-[%(levelname)s] : %(message)s', datefmt='%H:%M:%S')
+    timeFormat = '%H:%M:%S'
+
+    if level == 20:
+        formatter = logging.Formatter(
+            '[%(asctime)s]-[%(levelname)s] : %(message)s', 
+            datefmt=timeFormat
+            )
+    else:
+        formatter = logging.Formatter(
+            '[%(asctime)s]-[%(levelname)s] (from %(funcName)s in %(module)s) : %(message)s', 
+            datefmt=timeFormat
+            )
+
+    SUCCESS, FAILURE, ASK = 21, 22, 23
+    logging.addLevelName(SUCCESS, colored('+', 'green'))
+    logging.addLevelName(FAILURE, colored('!', 'red',attrs=['blink']))
+    logging.addLevelName(ASK, colored('?', 'yellow'))
 
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
+    setattr(logger, 'success', lambda *args: logger.log(SUCCESS, *args))
+    setattr(logger, 'failure', lambda *args: logger.log(FAILURE, *args))
+    setattr(logger, 'ask', lambda *args: logger.log(ASK, *args))
 
     Consolehandler = logging.StreamHandler(sys.stdout)
-    #Consolehandler.setFormatter(formatter)
-    Consolehandler.setFormatter(CustomFormatter())
+
+    
+    Consolehandler.setFormatter(formatter)
+
     logger.addHandler(Consolehandler)
 
 
