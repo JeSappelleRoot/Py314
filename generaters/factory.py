@@ -2,7 +2,7 @@ import os
 import logging
 from cmd import Cmd
 from termcolor import colored
-from generaters import bind_agent
+from generaters import template
 from prettytable import PrettyTable
 
 class Prompt(Cmd):
@@ -86,7 +86,7 @@ class Prompt(Cmd):
         if generation is True:
 
             if self.optionsDict['type'] == 'bind_agent':
-                bind_agent.writeAgent(
+                template.writeAgent(
                     self.optionsDict['outfile'],
                     self.optionsDict['address'],
                     self.optionsDict['port'],
