@@ -65,7 +65,7 @@ def reverse_listener(ip, port):
 
     while True: 
         channel, cliAddress = channel.accept()
-        logger.info(f"Received connection from  agent {cliAddress[0]}")
+        logger.info(f"Received connection from agent {cliAddress[0]}")
 
         return channel
 
