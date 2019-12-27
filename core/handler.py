@@ -192,9 +192,6 @@ class Prompt(Cmd):
             
         elif not arg:
             table = PrettyTable()
-            #table.vertical_char = ' '
-            #table.border = False
-
             headers = ['command', 'description']
             table.field_names = headers
 
