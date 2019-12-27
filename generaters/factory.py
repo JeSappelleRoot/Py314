@@ -85,13 +85,15 @@ class Prompt(Cmd):
 
         if generation is True:
 
-            if self.optionsDict['type'] == 'bind_agent':
-                template.writeAgent(
-                    self.optionsDict['outfile'],
-                    self.optionsDict['address'],
-                    self.optionsDict['port'],
-                    self.optionsDict['password']
-                )
+
+            socket = template.createSocket(self.optionsDict['type'])
+            template.writeAgent(
+                self.optionsDict['outfile'],
+                socket,
+                self.optionsDict['address'],
+                self.optionsDict['port'],
+                self.optionsDict['password']
+            )
                 
 
     def do_options(self, arg):

