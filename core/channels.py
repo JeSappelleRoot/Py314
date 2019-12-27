@@ -48,6 +48,23 @@ def parseProxy(proxy):
 
 
 
+def reverse_listener(ip, port):
+    """Define a reverse listener to wait for an agent connection"""
+
+    logger = logging.getLogger('main')
+
+    logger.debug(f"Local IP address : {ip}")
+    logger.debug(f"Local port : {port}")
+
+    channel = socks.socksocket(family=socket.AF_INET, type=socket.SOCK_STREAM)
+    channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    channel.bind((ip, port))
+    channel.listen(1)
+    logger.ask(f"Listening on {ip}:{port}")
+
+    
+
 
 def bind_tcp(ip, port, proxy):
     """Create a TCP socket with binding remote agent"""
@@ -74,7 +91,6 @@ def bind_tcp(ip, port, proxy):
             logger.debug('Proxy is invalid, connection aborted')
             return False
 
-
     try:
 
         channel.connect((ip, port))
@@ -95,8 +111,6 @@ def bind_tcp(ip, port, proxy):
         logger.failure(f"Can't established connection to {ip}:{port}")
         logger.debug(error)
         channel = False
-
-
 
     return channel
     
