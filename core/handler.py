@@ -159,12 +159,12 @@ class Agent(Cmd):
 class Prompt(Cmd):
     """Simple Py314 Bind TCP handler"""
 
-
+    # Define some default values for options
     optionsDict = {
         'rhost': '10.0.10.110',
         'rport': 1234,
         'password': 'Py314!',
-        'proxy': 'socks5://10.0.10.117:1080', 
+        'proxy': '', 
         'verbose': False,
         'type': 'bind_agent'
     }
