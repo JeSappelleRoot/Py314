@@ -17,7 +17,7 @@ def parseProxy(proxy):
 
         availableProxies = ['SOCKS4', 'SOCKS5', 'HTTP']
         if proxyType.upper() not in availableProxies:
-            logger.failure('Please use a valid proxy type : socks4, socks5 or http')
+            logger.warning('Please use a valid proxy type : socks4, socks5 or http')
             validProxy = False
 
         if proxyType.upper() == 'SOCKS4':
@@ -40,7 +40,7 @@ def parseProxy(proxy):
         return validProxy, proxyParam
 
     except IndexError as error:
-        logger.failure('Please specify a proxy with <type>://<ip>:<port>')
+        logger.warning('Please specify a proxy with <type>://<ip>:<port>')
         proxyParam = False
         validProxy = False
 
@@ -94,21 +94,21 @@ def bind_tcp(ip, port, proxy):
     try:
 
         channel.connect((ip, port))
-        logger.success(f"Channel successfully established with remote agent")
+        logger.info(f"Channel successfully established with remote agent")
 
     
     except socks.ProxyConnectionError as error:
-        logger.failure(f"Can't established connection with specified proxy")
+        logger.warning(f"Can't established connection with specified proxy")
         channel = False
 
     except socks.GeneralProxyError as error:
-        logger.failure(f"Can't established connection to {ip}:{port}")
+        logger.warning(f"Can't established connection to {ip}:{port}")
         logger.debug('General proxy error')
         channel = False
 
 
     except ConnectionError as error:
-        logger.failure(f"Can't established connection to {ip}:{port}")
+        logger.warning(f"Can't established connection to {ip}:{port}")
         logger.debug(error)
         channel = False
 
