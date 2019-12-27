@@ -161,12 +161,12 @@ class Prompt(Cmd):
 
     # Define some default values for options
     optionsDict = {
-        'rhost': '10.0.10.110',
+        'rhost': '10.0.10.10',
         'rport': 1234,
         'password': 'Py314!',
         'proxy': '', 
         'verbose': False,
-        'type': 'bind_agent'
+        'type': 'reverse_listener'
     }
 
 # < -------------------------- OVERRIDE -------------------------- >
@@ -221,7 +221,7 @@ class Prompt(Cmd):
 
     def do_run(self, arg):
         """Launch handler with defined settings"""
-        bindAgent(self.optionsDict)
+        ConnectAgent(self.optionsDict)
 
     def do_set(self, arg):
         """Set value for available option : set <option> <value>"""
@@ -328,7 +328,7 @@ def startModule():
 
 
 
-def bindAgent(dictionnary):
+def ConnectAgent(dictionnary):
 
     host = dictionnary['rhost']
     port = int(dictionnary['rport'])
@@ -343,6 +343,12 @@ def bindAgent(dictionnary):
     
         if agentType == 'bind_agent':
             channel = channels.bind_tcp(host, port, proxy)
+            if type(channel) == bool:
+                logger.debug('Returned channel is false')
+                return
+
+        elif agentType == 'reverse_listener':
+            channel = channels.reverse_listener(host, port)
             if type(channel) == bool:
                 logger.debug('Returned channel is false')
                 return
