@@ -39,11 +39,11 @@ def Check(channel, password):
         checkAnswer = crypto.decrypt_message(password, rawResponse.decode())
         # If agent answer is 'alive !', log info 
         if checkAnswer == 'alive !':
-            logger.success(f"Agent is alive")
+            logger.info(f"Agent is alive")
 
     # ConnectionResetError is raise if channel (socket) is unavailable
     except ConnectionResetError:
-        logger.failure(f"Channel reset by peer (broken pipe error)")
+        logger.warning(f"Channel reset by peer (broken pipe error)")
         return True
 
 def Download(channel, password, source, destination):
@@ -98,7 +98,7 @@ def Download(channel, password, source, destination):
 
         # If decrypted answer is '!', the remote agent tell that the remote folder doesn't exist
         if decryptedAnswer == '!':
-            logger.failure(f"Remote file {source} doesn't exist")
+            logger.warning(f"Remote file {source} doesn't exist")
 
         # Elif agent tell he's ready to send remote file
         elif decryptedAnswer == 'ready':
@@ -124,12 +124,12 @@ def Download(channel, password, source, destination):
             # Remove temporary file
             os.remove(tempFile)
             logger.debug(f"Temporary file {tempFile} deleted")
-            logger.success(f"File successfully downloaded to {finalFile}")
+            logger.info(f"File successfully downloaded to {finalFile}")
 
 
     except Exception as error:
-        logger.failure('An error occured during downloading file : ')
-        logger.failure(error)
+        logger.warning('An error occured during downloading file : ')
+        logger.warning(error)
 
 
 
@@ -184,7 +184,7 @@ def Upload(channel, password, source, destination):
 
         # If agent's answer is '!', the remote directory doesn't exist
         if decryptedAnswer == '!':
-            logger.failure(f"Remote directory {destination} doesn't exist")
+            logger.warning(f"Remote directory {destination} doesn't exist")
 
         # Else if agent say 'ready', continue the upload request
         elif decryptedAnswer == 'ready':
@@ -200,11 +200,11 @@ def Upload(channel, password, source, destination):
             # Finally remove temporary encrypted file
             os.remove(tempFile)
             logger.debug(f"File {tempFile} removed")
-            logger.success(f"File {source} successfully uploaded")
+            logger.info(f"File {source} successfully uploaded")
 
     except Exception as error:
-        logger.failure('An error occured during sending file : ')
-        logger.failure(error)
+        logger.warning('An error occured during sending file : ')
+        logger.warning(error)
         
     
 def Shell(channel, password, command):
