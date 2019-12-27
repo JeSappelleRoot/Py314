@@ -161,7 +161,7 @@ class Prompt(Cmd):
 
     # Define some default values for options
     optionsDict = {
-        'host': '10.0.10.10',
+        'host': '10.0.10.1',
         'port': 1234,
         'password': 'Py314!',
         'proxy': '', 
