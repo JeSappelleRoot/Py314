@@ -345,9 +345,7 @@ def bindAgent(dictionnary):
     try:
     
         if agentType == 'bind_agent':
-
             channel = channels.bind_tcp(host, port, proxy)
-
             if type(channel) == bool:
                 logger.debug('Returned channel is false')
                 return
