@@ -44,21 +44,14 @@ def setup_logger(name, level):
             datefmt=timeFormat
             )
 
-    # Add numeric values of news logging level
-    SUCCESS, FAILURE, ASK = 21, 22, 23
-    # Define new levels, with headers, and colors ;)
-    logging.addLevelName(SUCCESS, colored('+', 'green'))
-    logging.addLevelName(FAILURE, colored('!', 'red',attrs=['blink']))
-    logging.addLevelName(ASK, colored('?', 'yellow'))
+
+    # Override existing levels (info and warning, for 20 and 30), with headers, and colors ;)
+    logging.addLevelName(20, colored('+', 'green'))
+    logging.addLevelName(30, colored('!', 'red',attrs=['blink']))
 
     # Define a logger with given name in argument and set level
     logger = logging.getLogger(name)
     logger.setLevel(level)
-
-    # Add attributes to the current logger, tu use new levels
-    setattr(logger, 'success', lambda *args: logger.log(SUCCESS, *args))
-    setattr(logger, 'failure', lambda *args: logger.log(FAILURE, *args))
-    setattr(logger, 'ask', lambda *args: logger.log(ASK, *args))
 
     # Define a console handler, to write output to the console
     Consolehandler = logging.StreamHandler(sys.stdout)
