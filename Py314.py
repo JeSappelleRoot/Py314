@@ -8,10 +8,10 @@ import logging
 from prettytable import PrettyTable
 from cmd import Cmd
 from termcolor import colored
-from handlers import bind_agent
+#from handlers import bind_agent
 from generaters import factory
 from core.logger import setup_logger
-
+from core import handler
 
 def displayBanner():
     """Banner definition"""
@@ -98,7 +98,7 @@ class Prompt(Cmd):
 
     def do_handler(self, arg):
         """Try to established a connection with a Py314 agent"""
-        bind_agent.startModule()
+        handler.startModule()
 
     def do_reverse_agent(self, arg):
         """Try to established a connection with listening a Py314 agent"""
