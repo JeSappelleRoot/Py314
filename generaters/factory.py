@@ -81,7 +81,7 @@ class Prompt(Cmd):
         for key, value in self.optionsDict.items():
             if value == '':
                 generation = False
-                logger.warning(f"The option {key} can't be empty")
+                logger.failure(f"The option {key} can't be empty")
 
         if generation is True:
 
@@ -120,7 +120,7 @@ class Prompt(Cmd):
         """Set value for available option : set <option> <value>"""
 
         if len(arg.split(' ')) > 2 or len(arg.split(' ')) < 2:
-            logger.warning(f"Please specify set <option> <value>")
+            logger.failure(f"Please specify set <option> <value>")
         
         else:
 
@@ -129,10 +129,10 @@ class Prompt(Cmd):
             value = arg.split(' ')[1]
 
             if option not in availableOptions:
-                logger.warning(f"[!] Option {option} can't be set")
+                logger.failure(f"Option {option} can't be set")
 
             elif option == 'type' and value not in self.availableTypes:
-                logger.warning(f"Specify a valid type of agent : ")
+                logger.failure(f"Specify a valid type of agent : ")
                 for agent in self.availableTypes:
                     print(f" - {agent}")
             else:
@@ -145,7 +145,7 @@ class Prompt(Cmd):
         """Unset value for available option : unset <option>"""
 
         if len(arg.split(' ')) > 1 or len(arg.split(' ')) < 1:
-            logger.warning(f"Please specify unset <option>")
+            logger.failure(f"Please specify unset <option>")
         
         else:
 
@@ -153,7 +153,7 @@ class Prompt(Cmd):
             option = arg.split(' ')[0]
 
             if option not in availableOptions:
-                logger.warning(f"Option {option} can't be unset")
+                logger.failure(f"Option {option} can't be unset")
             else:
                 self.optionsDict[option] = ''
 
