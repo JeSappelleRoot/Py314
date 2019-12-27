@@ -321,7 +321,6 @@ def startModule():
 
     
     subPrompt = Prompt()
-    #subPrompt.define_logger(logger)
     subPrompt.prompt = f"({colored('bind_agent', 'yellow')}) > "
     subPrompt.cmdloop()
 
@@ -379,7 +378,7 @@ def bindAgent(dictionnary):
 
 
     except OSError as error:
-        #logger.warning(error)
+        logger.failure(error)
         return
 
 
