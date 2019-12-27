@@ -141,17 +141,17 @@ try:
     level = checkLevel(sys.argv)
     logger = setup_logger('main', level)
     
+    # Check config
     checkConfig()
+    # Display awesome banner ;)
     displayBanner()
 
+    # Define a prompt, with Cmd class
     Interpreter = Prompt()
     Interpreter.prompt = colored('Py314 > ', 'cyan')
     Interpreter.intro = 'Type help or ? to list commands.'
+    # Launch the main Interpreter
     Interpreter.cmdloop()
-
-
-
-
 
 
 except KeyboardInterrupt:
