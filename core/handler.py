@@ -237,7 +237,7 @@ class Prompt(Cmd):
                 logger.failure(f"Option {option} can't be set with this handler")
             else:
                 self.optionsDict[option] = value
-                logger.debug(f'Option [{option}] set to [{value}]')
+                logger.debug(f'Option <{option}> set to <{value}>')
         else:
             logger.failure(f'Please specify an <option> and a associated <value>')
 
