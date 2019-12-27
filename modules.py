@@ -106,7 +106,7 @@ def Download(channel, password, source, destination):
             # Open a temporary encrypted file in append binary mode
             with open(tempFile, 'ab') as fileStream:
                 # Define a bufferSize and a rawFile content
-                bufferSize rawFile = BUFFER_SIZE, b''
+                bufferSize, rawFile = BUFFER_SIZE, b''
             
                 # While loop to complete socket buffer in recv 
                 # If the remote agent needs more data than buffer size, he's will send file in many times
