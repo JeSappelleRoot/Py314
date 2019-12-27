@@ -344,12 +344,14 @@ def bindAgent(dictionnary):
     
     try:
     
-        channel = channels.bind_tcp(host, port, proxy)
+        if agentType == 'bind_agent':
 
-        if type(channel) == bool:
-            logger.debug('Returned channel is false')
-            return
-        
+            channel = channels.bind_tcp(host, port, proxy)
+
+            if type(channel) == bool:
+                logger.debug('Returned channel is false')
+                return
+            
 
         challenge = passwordChallenge(channel, ciperPassword)
 
