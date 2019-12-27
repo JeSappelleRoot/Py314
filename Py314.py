@@ -96,8 +96,8 @@ class Prompt(Cmd):
         """Quit Polymole"""
         return True
 
-    def do_bind_agent(self, arg):
-        """Try to established a connection with binding a Py314 agent"""
+    def do_handler(self, arg):
+        """Try to established a connection with a Py314 agent"""
         bind_agent.startModule()
 
     def do_reverse_agent(self, arg):

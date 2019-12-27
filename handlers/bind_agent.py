@@ -165,7 +165,8 @@ class Prompt(Cmd):
         'rport': 1234,
         'password': 'Py314!',
         'proxy': 'socks5://10.0.10.117:1080', 
-        'verbose': False
+        'verbose': False,
+        'type': 'bind_agent'
     }
 
 # < -------------------------- OVERRIDE -------------------------- >
@@ -306,6 +307,10 @@ class Prompt(Cmd):
         """Enable verbosity of bind_agent handler (default : False)"""
         self.optionsDict['verbose'] = arg
 
+    def set_type(self):
+        """Define type of handler : bind_agent/reverse_listener"""
+        self.optionsDict['type'] = arg
+
 
 
 
@@ -321,7 +326,7 @@ def startModule():
 
     
     subPrompt = Prompt()
-    subPrompt.prompt = f"({colored('bind_agent', 'yellow')}) > "
+    subPrompt.prompt = f"({colored('handler', 'yellow')}) > "
     subPrompt.cmdloop()
 
 
@@ -333,6 +338,7 @@ def bindAgent(dictionnary):
     password = dictionnary['password']
     proxy = dictionnary['proxy']
     verbose = dictionnary['verbose']
+    agentType = dictionnary['type']
 
     ciperPassword = hashlib.sha512(password.encode()).hexdigest()
     
