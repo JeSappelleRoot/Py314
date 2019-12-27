@@ -14,7 +14,7 @@ class Prompt(Cmd):
 
     optionsDict = {
         'type': 'bind_agent',
-        'address': '10.0.10.110',
+        'host': '10.0.10.110',
         'port': 1234,
         'password': 'Py314!',
         'outfile': f"{py314Folder}/agent.py"
@@ -90,7 +90,7 @@ class Prompt(Cmd):
             template.writeAgent(
                 self.optionsDict['outfile'],
                 socket,
-                self.optionsDict['address'],
+                self.optionsDict['host'],
                 self.optionsDict['port'],
                 self.optionsDict['password']
             )
@@ -167,7 +167,7 @@ class Prompt(Cmd):
     def set_type(self):
         """Define the type of agent : bind_agent/reverse_listener"""
 
-    def set_address(self):
+    def set_host(self):
         """Define the IP address to bind/listen"""
 
     def set_outfile(self):
