@@ -5,13 +5,13 @@ import os
 import sys
 import glob
 import logging
-from prettytable import PrettyTable
 from cmd import Cmd
+from core import handler
 from termcolor import colored
-#from handlers import bind_agent
 from generaters import factory
 from core.logger import setup_logger
-from core import handler
+from prettytable import PrettyTable
+
 
 def displayBanner():
     """Banner definition"""
