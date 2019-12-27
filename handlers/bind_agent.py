@@ -30,11 +30,11 @@ class Agent(Cmd):
             modules.Shell(self.channel, self.password, cmd)
 
         except ConnectionResetError:
-            logger.warning(f"Channel reset by peer")
+            logger.failure(f"Channel reset by peer")
             return True
 
         except BrokenPipeError:
-            logger.warning(f"Channel reset by peer (broken pipe error)")
+            logger.failure(f"Channel reset by peer (broken pipe error)")
             return True
 
     def emptyline(self):
@@ -99,7 +99,7 @@ class Agent(Cmd):
 
         # If arg, separate by space is different from 2 (needs source and destination path)
         if len(arg.split(' ')) != 2:
-            logger.warning('Please specify a remote file and a local directory')
+            logger.failure('Please specify a remote file and a local directory')
             logger.debug(f"Arguments : {arg}")
 
         else: 
@@ -109,11 +109,11 @@ class Agent(Cmd):
             finalFile = f"{dst}/{fileBasename}"
             
             if path.isfile(dst):
-                logger.warning("Destination can't be an existing file (must be an existing directory)")
+                logger.failure("Destination can't be an existing file (must be an existing directory)")
             elif path.isfile(finalFile):
-                logger.warning(f"File {finalFile} already exist !")
+                logger.failure(f"File {finalFile} already exist !")
             elif not path.isdir(dst):
-                logger.warning('Please specify a valid directory for destination')
+                logger.failure('Please specify a valid directory for destination')
             else:
                 logger.debug('Arguments are corrects, sended to Download module')
                 modules.Download(self.channel, self.password, src, dst)
@@ -131,7 +131,7 @@ class Agent(Cmd):
 
         # If arg, separate by space is different from 2 (needs source and destination path)
         if len(arg.split(' ')) != 2:
-            logger.warning('Please specify a source file and a remote directory')
+            logger.failure('Please specify a source file and a remote directory')
             logger.debug(f"Arguments : {arg}")
         else:
             # Unpack arg, to add infile and outfile
@@ -139,10 +139,10 @@ class Agent(Cmd):
             
             # If source file is a directory
             if path.isdir(src):
-                logger.warning("Source file can't be folder, please check source path")
+                logger.failure("Source file can't be folder, please check source path")
             # Else if sourcce file doesn't exist
             elif not path.isfile(src):
-                logger.warning("Source file doesn't exist, please check source path")
+                logger.failure("Source file doesn't exist, please check source path")
             else:
                 logger.debug('Arguments are corrects, sended to Send module')
                 modules.Upload(self.channel, self.password, src, dst)
@@ -236,12 +236,12 @@ class Prompt(Cmd):
             value = arg.split(' ')[1]
 
             if option not in availableOptions:
-                logger.info(f"Option {option} can't be set with this handler")
+                logger.failure(f"Option {option} can't be set with this handler")
             else:
                 self.optionsDict[option] = value
                 logger.debug(f'Option [{option}] set to [{value}]')
         else:
-            logger.warning(f'Please specify an <option> and a associated <value>')
+            logger.failure(f'Please specify an <option> and a associated <value>')
 
 
 
@@ -272,7 +272,7 @@ class Prompt(Cmd):
         """Unset value for available option : unset <option>"""
 
         if len(arg.split(' ')) > 1 or len(arg.split(' ')) < 1:
-            self.logger.warning(f"Please specify unset <option>")
+            self.logger.failure(f"Please specify unset <option>")
         
         else:
 
@@ -281,7 +281,7 @@ class Prompt(Cmd):
             #value = arg.split(' ')[1]
 
             if option not in availableOptions:
-                logger.warning(f"Option {option} can't be unset")
+                logger.failure(f"Option {option} can't be unset")
             else:
                 self.optionsDict[option] = ''
 
@@ -354,7 +354,7 @@ def bindAgent(dictionnary):
             logger.debug(f'Password > {password}')
             logger.debug(f'SHA512 > {ciperPassword}')
         elif challenge is False:
-            logger.warning(f"[!] Password doesn't match")
+            logger.failure(f"Password doesn't match")
             channel.close()
             return
 
@@ -413,12 +413,12 @@ def checkAgent(channel, objet):
             channel.sendall(b'alive ?')
 
         except ConnectionResetError:
-            logger.warning(f"Channel reset by peer")
+            logger.failure(f"Channel reset by peer")
             objet.do_exit()
             break
 
         except BrokenPipeError:
-            logger.warning(f"\nChannel reset by peer (broken pipe error)")
+            logger.failure(f"\nChannel reset by peer (broken pipe error)")
             objet.exit_prompt
             break
         
