@@ -14,6 +14,7 @@ from core.logger import setup_logger
 
 
 def displayBanner():
+    """Banner definition"""
 
     print(colored(r"""
   _____         ____  __ _  _   
@@ -31,10 +32,10 @@ def displayBanner():
 
 
 class Prompt(Cmd):
+    """Create prompt commands, class herited by Cmd"""
 
-
-    tempList = []
-    focus = ''
+    # Define empty temporary list and empty focus
+    tempList, focus = [], ''
 
 # < -------------------------- OVERRIDE -------------------------- >
 
@@ -49,32 +50,34 @@ class Prompt(Cmd):
     def do_help(self, arg):
         """Display help about commands"""
 
+        # Get all method of the object
         names = self.get_names()
+        # Get all "real" commands, with do_ at the begining
         commands = [names.replace('do_', '') for names in names if names.startswith('do_')]
         
+        # If help command have a argument (help <command>), get docstring of this command
         if arg:
-            
-            doc = getattr(self, 'do_' + arg).__doc__
-            print(doc)
-            
+            try:
+                doc = getattr(self, 'do_' + arg).__doc__
+                print(doc)
+            # Except AttributeError, if given arg isn't a existing command
+            except AttributeError:
+                logger.failure(f"No command {arg}")
+
+        # Elif no arg is submitted,  print all docstrings of each commands
+        # With PrettyTable module, to have autosize array, with pretty cool delimiters
         elif not arg:
             table = PrettyTable()
-            #table.vertical_char = ' '
-            #table.border = False
-
+            # Define and add headers of array
             headers = ['command', 'description']
             table.field_names = headers
-
+            # Left align each headers in the array
             for header in headers:
                 table.align[header] = 'l'
 
-                
-            for option in dir(self):
-                if option.startswith('do_'):
-                    commandName = option.replace('do_', '')
-                    commandDoc = getattr(self, option).__doc__
-
-                    table.add_row([commandName, commandDoc])
+            for command in commands:
+                commandDoc = getattr(self, f"do_{command}").__doc__
+                table.add_row([command, commandDoc])
 
             print(table)
 
