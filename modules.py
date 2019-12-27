@@ -96,17 +96,20 @@ def Download(channel, password, source, destination):
         decryptedAnswer = crypto.decrypt_message(password, agentAnswer.decode())
         logger.debug(f"Agent answer : {decryptedAnswer}")
 
+        # If decrypted answer is '!', the remote agent tell that the remote folder doesn't exist
         if decryptedAnswer == '!':
             logger.failure(f"Remote file {source} doesn't exist")
 
+        # Elif agent tell he's ready to send remote file
         elif decryptedAnswer == 'ready':
 
+            # Open a temporary encrypted file in append binary mode
             with open(tempFile, 'ab') as fileStream:
-
-                bufferSize = BUFFER_SIZE
-                rawFile = b''
+                # Define a bufferSize and a rawFile content
+                bufferSize rawFile = BUFFER_SIZE, b''
             
                 # While loop to complete socket buffer in recv 
+                # If the remote agent needs more data than buffer size, he's will send file in many times
                 while True:
                     rawFile = channel.recv(bufferSize)
                     fileStream.write(rawFile)
@@ -116,7 +119,9 @@ def Download(channel, password, source, destination):
                         break
             logger.debug(f"Temporary file successfully written")
 
+            # Decrypt final destination plain file
             crypto.decrypt_file(password, tempFile, finalFile)
+            # Remove temporary file
             os.remove(tempFile)
             logger.debug(f"Temporary file {tempFile} deleted")
             logger.success(f"File successfully downloaded to {finalFile}")
@@ -133,7 +138,7 @@ def Upload(channel, password, source, destination):
     """Upload a file from a local directory to remote agent"""
 
     try:
-
+        # Define a buffer size in bytes
         BUFFER_SIZE = 1024
 
         # Get the main logger, defined in logger module
@@ -238,8 +243,8 @@ def Shell(channel, password, command):
             if len(tempBuffer) < bufferSize:
                 logger.debug('break recv while loop')
                 break
+            
         # Decode bytes to string to read the answer of the remote agent
-        
         shellReponseEncrypted = rawResponse.decode()
         shellResponse = crypto.decrypt_message(password, shellReponseEncrypted)
 
