@@ -145,6 +145,15 @@ class Prompt(Cmd):
                 logger.warning(f"Specify a valid type of agent : ")
                 for agent in self.availableTypes:
                     print(f" - {agent}")
+
+            if option == 'compress':
+                if value.capitalize() == 'True':
+                        self.optionsDict[option][1] = True
+                elif value.capitalize() == 'False':
+                    self.optionsDict[option][1] = False
+                else:
+                    logger.warning('Set compress option to True or False')
+                
             else:
                 logger.debug(f'Option [{option}] set to [{value}]')
                 self.optionsDict[option][1] = value
