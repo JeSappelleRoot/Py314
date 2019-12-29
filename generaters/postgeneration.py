@@ -7,6 +7,9 @@ def ofuscate_compression(nb, source, dest):
 
     try:
 
+        logger.debug(f"Source file : {source}")
+        logger.debug(f"Destination file : {dest}")
+
         with open(source, 'r') as fileStream:
             content = fileStream.read()
 
@@ -18,7 +21,7 @@ def ofuscate_compression(nb, source, dest):
 
             random = randint(0, 2)
             method = methods[random]
-            print(f"Méthode choisie : {method}")
+            logger.debug(f"Choosen method for iteration {i} : {method}")
 
             if method == 'bz2':
                 result = compression.bz2_pack(temp)
@@ -33,7 +36,7 @@ def ofuscate_compression(nb, source, dest):
             fileStream.write(result)
 
     except Exception as error:
-        print(error)
+        logger.warning(error)
 
 
 logger = logging.getLogger('main')
