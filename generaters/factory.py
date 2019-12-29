@@ -82,6 +82,15 @@ class Prompt(Cmd):
 
         generation = True
 
+        logger.debug(f"Type : {self.optionsDict['type'][1]}")
+        logger.debug(f"Outfile : {self.optionsDict['outfile'][1]}")
+        logger.debug(f"Host : {self.optionsDict['host'][1]}")
+        logger.debug(f"Port : {self.optionsDict['port'][1]}")
+        logger.debug(f"Password : {self.optionsDict['password'][1]}")
+        logger.debug(f"Compression : {self.optionsDict['compress'][1]}")
+        logger.debug(f"Iterations : {self.optionsDict['iterations'][1]}")
+        logger.debug(f"Compile : {self.optionsDict['compile'][1]}")
+
         for key, value in self.optionsDict.items():
             if value == '':
                 generation = False
