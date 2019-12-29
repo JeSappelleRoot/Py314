@@ -10,8 +10,11 @@ def ofuscate_compression(nb, source, dest):
         logger.debug(f"Source file : {source}")
         logger.debug(f"Destination file : {dest}")
 
+        
         with open(source, 'r') as fileStream:
             content = fileStream.read()
+        
+        logger.info(f'Source file {source} successfully read')
 
         temp = content
         methods = ['bz2', 'gz2', 'lzma']
@@ -32,8 +35,11 @@ def ofuscate_compression(nb, source, dest):
 
             temp = result
 
+
         with open(dest, 'w') as fileStream:
             fileStream.write(result)
+        
+        logger.info(f"Destination file {dest} successfully written")
 
     except Exception as error:
         logger.warning(error)
