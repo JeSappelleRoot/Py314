@@ -14,8 +14,6 @@ def ofuscate_compression(nb, src, dst):
         # Open source file and get the content
         with open(src, 'r') as fileStream:
             content = fileStream.read()
-        # Display info
-        logger.info(f'Source file {src} successfully read')
         # Initialize a temporary file
         temp = content
         # Define availables methods
