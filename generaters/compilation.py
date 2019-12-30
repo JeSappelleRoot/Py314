@@ -146,6 +146,8 @@ def main_compile(src):
             os.remove(cFile)
             logger.debug(f"Remove {src}")
             os.remove(src)
+        elif compileResult is False:
+            os.remove(cFile)
     elif cythonResult is False:
         logger.debug('C conversion is False')
         os.remove(cFile)
