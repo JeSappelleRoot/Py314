@@ -450,7 +450,7 @@ def checkOptions(dictionnary):
         if ip.version != 4:
             logger.warning(f"IPv6 is not supported by Py314")
             valid = False
-        elif dictionnary['host'].split('.')[-1].startswith('0'):
+        elif dictionnary['host'].split('.')[-1].startswith('0') and dictionnary['host'] != '0.0.0.0':
             logger.warning(f"Invalid IP address for host : {dictionnary['host']}")
             valid = False
 
