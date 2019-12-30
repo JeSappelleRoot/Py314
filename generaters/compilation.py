@@ -1,9 +1,3 @@
-import os
-import pkgconfig
-from cyther import core
-from subprocess import Popen, PIPE
-
-
 
 def parseInclude(flag):
     """Function to parse include from pkgconfig module"""
@@ -27,16 +21,18 @@ def parseInclude(flag):
 
         # Concatene all element of list with space
         finalInclude = ' '.join(includes)
+        # Return a final boolean value
+        result = True
 
-        
     except pkgconfig.PackageNotFoundError as error:
         print(f"Includes for {flag} not founds")
-        finalInclude = False
+        # Return a final boolean value
+        result = False
 
-    return finalInclude
+    return result
 
 
-def py_to_cython(src, dst):
+def convert_to_cython(src, dst):
     """Function to convert python code to Cython, with python interpreter embed"""
     # Command line equivalent : 
     # cython -3 -v --embed hello.py -o hello.c
@@ -49,11 +45,15 @@ def py_to_cython(src, dst):
 
     if returnCode == 0:
         print(f'Successfully conversion to {dst}')
+        result = True
+
     elif returnCode != 0:
         print('An error occured during agent conversion to C')
-        print(output)
+        print(output.decode())
+        result = False
 
 
+    return result
 
 
 
@@ -64,16 +64,25 @@ def compile_to_elf(src, dst):
 
     includes = parseInclude('python3')
 
-    # gcc hello.c -o hello $(pkg-config --libs --cflags python3)
-    command = f"gcc {src} -o {dst} {includes}"
-    #print(command)
-    process = Popen(command.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    output, error = process.communicate()
-    returnCode = process.returncode
+    if includes is not False:
 
-    if returnCode == 0:
-        print(f"Successfully compilation to {dst}")
-    elif returnCode != 0:
-        print(f"An error occured during compilation : ")
-        print(error)
+        command = f"gcc {src} -o {dst} {includes}"
+        process = Popen(command.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        output, error = process.communicate()
+        returnCode = process.returncode
 
+        if returnCode == 0:
+            print(f"Successfully compilation to {dst}")
+            result = True
+        elif returnCode != 0:
+            print(f"An error occured during compilation : ")
+            print(error.decode())
+            result = False
+
+    elif includes is False:
+        print("Compilation aborted")        
+        os.remove(src)
+        result = False
+
+    
+    return result
