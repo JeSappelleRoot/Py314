@@ -32,10 +32,11 @@ def parseInclude(flag):
 
     except pkgconfig.PackageNotFoundError as error:
         print(f"Includes for {flag} not founds")
-        # Return a final boolean value
+        # Return a final boolean value and empty finalInclude
+        finalInclude = ''
         result = False
 
-    return result
+    return result, finalInclude
 
 
 def convert_to_cython(src, dst):
@@ -73,11 +74,12 @@ def compile_to_elf(src, dst):
     # Command line equivalent : 
     # gcc CSOURCE -o ELFDEST $(pkg-config --libs --cflags python3)
 
-    # Parse python3 includes for gcc command
-    includes = parseInclude('python3')
+    # Parse python3 includes for gcc command (receive boolean and string)
+    state, includes = parseInclude('python3')
+    print(includes)
 
     # If includes are valid
-    if includes is not False:
+    if state is not False:
         # Define a gcc command and launch it with Popen
         command = f"gcc {src} -o {dst} {includes}"
         process = Popen(command.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -96,10 +98,32 @@ def compile_to_elf(src, dst):
             result = False
 
     # If includes are invalid
-    elif includes is False:
+    elif state is False:
         print("Compilation aborted")        
         os.remove(src)
         result = False
 
     
     return result
+
+
+def main_compile(src):
+    """Main function to launch compilation"""
+
+    parentFolder = os.path.dirname(src)
+    basename = os.path.basename(src)
+    name = os.path.splitext(basename)[0]
+    
+    cFile = f"{parentFolder}/{name}.c"
+    elfFile = f"{parentFolder}/{name}"
+
+    result = convert_to_cython(src, cFile)
+    if result is True:
+        compile_to_elf(cFile, elfFile)
+
+
+
+
+src = r'/home/scratch/.Py314/agent.py'
+
+main_compile(src)
