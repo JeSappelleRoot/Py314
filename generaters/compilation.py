@@ -117,9 +117,15 @@ def main_compile(src):
     cFile = f"{parentFolder}/{name}.c"
     elfFile = f"{parentFolder}/{name}"
 
-    result = convert_to_cython(src, cFile)
-    if result is True:
-        compile_to_elf(cFile, elfFile)
+    cythonResult = convert_to_cython(src, cFile)
+    if cythonResult is True:
+        compileResult = compile_to_elf(cFile, elfFile)
+        if compileResult is True:
+            os.remove(cFile)
+            os.remove(src)
+    elif cythonResult is False:
+        os.remove(cFile)
+
 
 
 
