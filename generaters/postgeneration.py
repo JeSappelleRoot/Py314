@@ -1,12 +1,13 @@
 import logging
 from random import randint
 from pyminifier import compression
-import compilation
+
 
 def ofuscate_compression(nb, src, dst):
 
     try:
         # Some debug
+        logger.debug(f"Iterations : {nb}")
         logger.debug(f"Source file : {src}")
         logger.debug(f"Destination file : {dst}")
 
@@ -27,7 +28,7 @@ def ofuscate_compression(nb, src, dst):
             # Choose method with this random int
             method = methods[random]
             # Some debug
-            logger.debug(f"Choosen method for iteration {i} : {method}")
+            logger.debug(f"Choosen method for iteration {i + 1} : {method}")
             # Switch case with method and compress
             if method == 'bz2':
                 result = compression.bz2_pack(temp)
