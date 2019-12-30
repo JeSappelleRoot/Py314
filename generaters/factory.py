@@ -84,42 +84,47 @@ class Prompt(Cmd):
 
         generation = True
 
-        logger.debug(f"Type : {self.optionsDict['type'][1]}")
-        logger.debug(f"Outfile : {self.optionsDict['outfile'][1]}")
-        logger.debug(f"Host : {self.optionsDict['host'][1]}")
-        logger.debug(f"Port : {self.optionsDict['port'][1]}")
-        logger.debug(f"Password : {self.optionsDict['password'][1]}")
-        logger.debug(f"Compression : {self.optionsDict['compress'][1]}")
-        logger.debug(f"Iterations : {self.optionsDict['iterations'][1]}")
-        logger.debug(f"Compile : {self.optionsDict['compile'][1]}")
+        agentType = self.optionsDict['type'][1]
+        outfile = self.optionsDict['outfile'][1]
+        host = self.optionsDict['host'][1]
+        port = self.optionsDict['port'][1]
+        password = self.optionsDict['password'][1]
+        compress = self.optionsDict['compress'][1]
+        iterations = self.optionsDict['iterations'][1]
+        gcc = self.optionsDict['compile'][1]
+
+
 
         for key, value in self.optionsDict.items():
-            if value == '':
+            
+            logger.debug(f"{key} : {value[1] } (weight : {value[0]})")
+
+            if value[1] == '':
                 generation = False
                 logger.warning(f"The option {key} can't be empty")
 
         if generation is True:
 
 
-            socket = template.createSocket(self.optionsDict['type'][1])
+            socket = template.createSocket(agentType)
             template.writeAgent(
-                self.optionsDict['outfile'][1],
+                outfile,
                 socket,
-                self.optionsDict['host'][1],
-                self.optionsDict['port'][1],
-                self.optionsDict['password'][1]
+                host,
+                port,
+                password
             )
 
 
-            if self.optionsDict['compress'][1] == True:
+            if compress == True:
                 postgeneration.ofuscate_compression(
-                    int(self.optionsDict['iterations'][1]),
-                    self.optionsDict['outfile'][1], 
-                    self.optionsDict['outfile'][1]
+                    int(iterations),
+                    outfile, 
+                    outfile
                     )
 
-            if self.optionsDict['compile'][1] == True:
-                compilation.main_compile(self.optionsDict['outfile'][1])
+            if gcc == True:
+                compilation.main_compile(outfile)
 
                 
 
