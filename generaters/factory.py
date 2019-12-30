@@ -195,7 +195,7 @@ class Prompt(Cmd):
 
 
 
-    def do_unset(self, arg):
+    def disable_do_unset(self, arg):
         """Unset value for available option : unset <option>"""
 
         if len(arg.split(' ')) > 1 or len(arg.split(' ')) < 1:
