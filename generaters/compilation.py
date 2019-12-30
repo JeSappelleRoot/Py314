@@ -1,3 +1,9 @@
+import os
+import pkgconfig
+from cyther import core
+from subprocess import Popen, PIPE
+
+
 
 def parseInclude(flag):
     """Function to parse include from pkgconfig module"""
