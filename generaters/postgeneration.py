@@ -1,7 +1,7 @@
 import logging
 from random import randint
 from pyminifier import compression
-
+import compilation
 
 def ofuscate_compression(nb, src, dst):
 
@@ -45,4 +45,8 @@ def ofuscate_compression(nb, src, dst):
         logger.warning(error)
 
 
+
+
+
+# Define a logger for functions
 logger = logging.getLogger('main')
