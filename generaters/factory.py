@@ -5,6 +5,7 @@ from random import randint
 from termcolor import colored
 from generaters import template
 from prettytable import PrettyTable
+from . import postgeneration
 
 class Prompt(Cmd):
     """Simple Py314 agent factory"""
@@ -19,7 +20,7 @@ class Prompt(Cmd):
         'password':     [3, 'Py314!'],
         'type':         [4, 'bind_agent'],
         'outfile':      [5, f"{py314Folder}/agent.py"],
-        'compress':     [6, False],
+        'compress':     [6, True],
         'iterations':   [7, randint(2, 12)],
         'compile':      [8, False]
     }
@@ -107,6 +108,15 @@ class Prompt(Cmd):
                 self.optionsDict['port'][1],
                 self.optionsDict['password'][1]
             )
+
+
+            if self.optionsDict['compress'][1] == True:
+                postgeneration.ofuscate_compression(
+                    int(self.optionsDict['iterations'][1]),
+                    self.optionsDict['outfile'][1], 
+                    self.optionsDict['outfile'][1]
+                    )
+
                 
 
     def do_options(self, arg):
@@ -163,6 +173,13 @@ class Prompt(Cmd):
                     self.optionsDict[option][1] = False
                 else:
                     logger.warning(f'Set {option} option to True or False')
+
+            elif option == 'iterations':
+                try:
+                    value = int(value)
+                    self.optionsDict[option][1] = value
+                except ValueError:
+                    logger.warning(f"Please specify a numeric value for {option}")
                 
             else:
                 logger.debug(f'Option [{option}] set to [{value}]')
