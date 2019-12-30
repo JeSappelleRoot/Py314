@@ -118,6 +118,9 @@ class Prompt(Cmd):
                     self.optionsDict['outfile'][1]
                     )
 
+            if self.optionsDict['compile'][1] == True:
+                compilation.main_compile(self.optionsDict['outfile'][1])
+
                 
 
     def do_options(self, arg):
