@@ -184,10 +184,10 @@ class Prompt(Cmd):
                     logger.warning(f'Set {option} option to True or False')
 
             elif option == 'iterations':
-                if value.isdigit():
+                if value.isdigit() and int(value) > 0:
                     self.optionsDict[option][1] = int(value)
                 else:
-                    logger.warning(f"Please specify a numeric value for {option}")
+                    logger.warning(f"Please specify a numeric value for {option} and greater than 0")
                 
             else:
                 logger.debug(f'Option [{option}] set to [{value}]')
