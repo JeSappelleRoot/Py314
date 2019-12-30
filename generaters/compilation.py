@@ -37,14 +37,19 @@ def convert_to_cython(src, dst):
     # Command line equivalent : 
     # cython -3 -v --embed hello.py -o hello.c
 
+    # Define command
     command = f"cython -3 -v --embed {src} -o {dst}"
-
+    # split it and launch it with Popen
     process = Popen(command.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    # Get output stout and stderr of the command
     output, error = process.communicate()
+    # Get return code
     returnCode = process.returncode
 
+    # Check return code 
     if returnCode == 0:
         print(f'Successfully conversion to {dst}')
+        # Initialize a boolean result of function
         result = True
 
     elif returnCode != 0:
@@ -62,15 +67,20 @@ def compile_to_elf(src, dst):
     # Command line equivalent : 
     # gcc CSOURCE -o ELFDEST $(pkg-config --libs --cflags python3)
 
+    # Parse python3 includes for gcc command
     includes = parseInclude('python3')
 
+    # If includes are valid
     if includes is not False:
-
+        # Define a gcc command and launch it with Popen
         command = f"gcc {src} -o {dst} {includes}"
         process = Popen(command.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        # Get stdout and stderr of command
         output, error = process.communicate()
+        # Get return code
         returnCode = process.returncode
 
+        # Parse return code
         if returnCode == 0:
             print(f"Successfully compilation to {dst}")
             result = True
@@ -79,6 +89,7 @@ def compile_to_elf(src, dst):
             print(error.decode())
             result = False
 
+    # If includes are invalid
     elif includes is False:
         print("Compilation aborted")        
         os.remove(src)
