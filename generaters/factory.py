@@ -6,6 +6,7 @@ from termcolor import colored
 from generaters import template
 from prettytable import PrettyTable
 from . import postgeneration
+from . import compilation
 
 class Prompt(Cmd):
     """Simple Py314 agent factory"""
