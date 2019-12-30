@@ -126,10 +126,3 @@ def main_compile(src):
     elif cythonResult is False:
         os.remove(cFile)
 
-
-
-
-
-src = r'/home/scratch/.Py314/agent.py'
-
-main_compile(src)
