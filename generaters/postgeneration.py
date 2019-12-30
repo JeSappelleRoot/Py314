@@ -3,18 +3,18 @@ from random import randint
 from pyminifier import compression
 
 
-def ofuscate_compression(nb, source, dest):
+def ofuscate_compression(nb, src, dst):
 
     try:
 
-        logger.debug(f"Source file : {source}")
-        logger.debug(f"Destination file : {dest}")
+        logger.debug(f"Source file : {src}")
+        logger.debug(f"Destination file : {dst}")
 
         
-        with open(source, 'r') as fileStream:
+        with open(src, 'r') as fileStream:
             content = fileStream.read()
         
-        logger.info(f'Source file {source} successfully read')
+        logger.info(f'Source file {src} successfully read')
 
         temp = content
         methods = ['bz2', 'gz2', 'lzma']
@@ -36,10 +36,10 @@ def ofuscate_compression(nb, source, dest):
             temp = result
 
 
-        with open(dest, 'w') as fileStream:
+        with open(dst, 'w') as fileStream:
             fileStream.write(result)
         
-        logger.info(f"Destination file {dest} successfully written")
+        logger.info(f"Destination file {dst} successfully written")
 
     except Exception as error:
         logger.warning(error)
