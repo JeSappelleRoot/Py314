@@ -41,7 +41,7 @@ def ofuscate_compression(nb, src, dst):
         with open(dst, 'w') as fileStream:
             fileStream.write(result)
         # Display info
-        logger.info(f"Agent {src} successfully compressed")
+        logger.info(f"Agent {src} successfully compressed with {nb} iterations")
 
     except Exception as error:
         logger.warning(error)
