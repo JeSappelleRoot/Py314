@@ -57,8 +57,8 @@ def convert_to_cython(src, dst):
     # Get return code
     returnCode = process.returncode
 
-    logger.debug(f"OUTPUT : {output}")
-    logger.debug(f"ERROR : {error}")
+    logger.debug(f"OUTPUT : {output.decode()}")
+    logger.debug(f"ERROR : {error.decode()}")
     logger.debug(f"RETURN CODE : {returnCode}")
 
     # Check return code 
@@ -96,8 +96,8 @@ def compile_to_elf(src, dst):
         # Get return code
         returnCode = process.returncode
 
-        logger.debug(f"OUTPUT : {output}")
-        logger.debug(f"ERROR : {error}")
+        logger.debug(f"OUTPUT : {output.decode()}")
+        logger.debug(f"ERROR : {error.decode()}")
         logger.debug(f"RETURN CODE : {returnCode}")
 
         # Parse return code
