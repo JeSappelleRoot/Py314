@@ -36,7 +36,7 @@ def parseInclude(flag):
     return finalInclude
 
 
-def convert_to_cython(src, dst):
+def py_to_cython(src, dst):
     """Function to convert python code to Cython, with python interpreter embed"""
     # Command line equivalent : 
     # cython -3 -v --embed hello.py -o hello.c
