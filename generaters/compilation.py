@@ -1,7 +1,6 @@
 import os
 import logging
 import pkgconfig
-from cyther import core
 from subprocess import Popen, PIPE
 
 
