@@ -23,7 +23,7 @@ class Prompt(Cmd):
         'outfile':      [5, f"{py314Folder}/agent.py"],
         'compress':     [6, True],
         'iterations':   [7, randint(2, 12)],
-        'compile':      [8, False]
+        'compile':      [8, True]
     }
 
 
