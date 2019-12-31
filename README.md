@@ -1,5 +1,11 @@
+
+
+
+
 # Py314
 
+- [Py314](#py314)
+- [Requirements](#requirements)
 
 Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool
 
@@ -35,3 +41,5 @@ prettytable == 0.7.2
 pyminifier == 2.1
 termcolor == 1.1.0
 ```
+
+Simply run `pip install -r requirements.txt`
