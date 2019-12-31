@@ -1,7 +1,8 @@
 # Py314
 
 
-Py314 is a RAT (Remote Acess Tool) written in Python 3.
+Py314 is a RAT (Remote Access Tool) written in Python 3. 
+It based on the idea of great pentest tool Metasploit-Framework
 
 
 `####################################################`  
