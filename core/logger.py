@@ -1,5 +1,4 @@
 import sys
-import coloredlogs
 import logging
 from termcolor import colored
 
