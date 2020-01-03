@@ -10,6 +10,7 @@
     - [About agent compression](#about-agent-compression)
     - [About agent compilation](#about-agent-compilation)
     - [Demo](#demo)
+  - [Handler](#handler)
 
 Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool
 
@@ -74,8 +75,8 @@ This behaviour is modelled on Metasploit-Framework, with bind_tcp and reverse_tc
 
 Many options can be used with factory module : 
 - **host**, to define a IP address
-- **port**, to define a bind port
-- **password**, to define a password, used for symmetric encryption and decryption
+- **port**, to define a port to bind or to listen
+- **password**, to define a password, used for agent authentification, symmetric encryption and decryption
 - **type**, to define the agent type
 - **outfile**, to define the output agent file (default is ~/.Py314 folder)
 - **compress**, to enable compression (True or False)
@@ -135,3 +136,12 @@ Compilation follow the following recipe :
 ### Demo
 
 ![factory](https://user-images.githubusercontent.com/52102633/71747085-57891480-2e34-11ea-922e-1b090635a670.gif)
+
+## Handler
+
+Handler is the module used to try to establish a connection with a remote Py314 agent. This module needs some options : 
+- **host**, could be a remote IP or a local address to listen
+- **password**, used for agent authentification, symmetric encryption and decryption
+- **port**, to define a port to bind or to listen
+- **proxy**, to specify a proxy to use, only with **bind_agent** type (support HTTP, SOCKS4 and SOCKS5 proxy)
+- **type**, to specify the type of remote agent
