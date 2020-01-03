@@ -81,3 +81,5 @@ Many options can be used with factory module :
 **host** option will be a existing IP address on the local machine  
 **port** option will be a available port on the local machine  
 *The remote agent will bind the local machine with given couple host:port to try to establish a connection with Py314*
+
+![types](https://user-images.githubusercontent.com/52102633/71740851-f573e380-2e22-11ea-8e28-3fafc3c6e4d8.png)
