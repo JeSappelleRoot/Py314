@@ -217,7 +217,7 @@ class Prompt(Cmd):
         """Define the type of agent : bind_agent/reverse_listener"""
 
     def set_host(self):
-        """Define the IP address to bind/listen"""
+        """Define the IP address to bind/listen (0.0.0.0 to listen on all available addresses)"""
 
     def set_outfile(self):
         """Define the output file which contain agent script"""
