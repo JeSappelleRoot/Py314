@@ -7,6 +7,7 @@
 - [About modules](#about-modules)
   - [Factory](#factory)
     - [Options](#options)
+  - [Demo](#demo)
 
 Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool
 
@@ -90,3 +91,7 @@ Many options can be used with factory module :
 *The remote agent will bind the local machine with given couple host:port to try to establish a connection with Py314*
 
 ![types](https://user-images.githubusercontent.com/52102633/71740851-f573e380-2e22-11ea-8e28-3fafc3c6e4d8.png)
+
+## Demo
+
+![factory](https://user-images.githubusercontent.com/52102633/71747085-57891480-2e34-11ea-922e-1b090635a670.gif)
