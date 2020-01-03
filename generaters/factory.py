@@ -16,10 +16,10 @@ class Prompt(Cmd):
     py314Folder = f"{homeFolder}/.Py314"
 
     optionsDict = {
-        'host':         [1, '10.0.10.110'],
+        'host':         [1, '0.0.0.0'],
         'port':         [2, 1234],
         'password':     [3, 'Py314!'],
-        'type':         [4, 'bind_agent'],
+        'type':         [4, 'reverse_listener'],
         'outfile':      [5, f"{py314Folder}/agent.py"],
         'compress':     [6, True],
         'iterations':   [7, randint(2, 12)],
