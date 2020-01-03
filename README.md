@@ -1,10 +1,8 @@
-
-
-
-
 # Py314
 
 - [Py314](#py314)
+  - [Why Py314 ?](#why-py314)
+  - [Why this name ?](#why-this-name)
 - [Requirements](#requirements)
 - [About modules](#about-modules)
   - [Factory](#factory)
@@ -22,6 +20,15 @@ Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great M
 >Do not attempt to violate the law with anything contained here.  
 >The authors of this material, or anyone else affiliated in any way, are not going >to accept responsibility for your actions.  
 
+
+## Why Py314 ?
+
+Hacking is the best way to learn how to secure systems and networks.  
+Know how an attack is conducted teach you how to defend against threats.
+
+## Why this name ? 
+
+C'mon, it's a pun with `π` mathematic concept...
 
 
 # Requirements
