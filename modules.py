@@ -102,7 +102,8 @@ def Download(channel, password, source, destination):
 
         # Elif agent tell he's ready to send remote file
         elif decryptedAnswer == 'ready':
-
+            
+            logger.debug('Agent is ready for file transfer')
             # Open a temporary encrypted file in append binary mode
             with open(tempFile, 'ab') as fileStream:
                 # Define a bufferSize and a rawFile content
