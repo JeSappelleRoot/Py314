@@ -51,25 +51,28 @@ def parseProxy(proxy):
 def reverse_listener(ip, port):
     """Define a reverse listener to wait for an agent connection"""
 
-    logger = logging.getLogger('main')
+    try:
 
-    logger.debug(f"Local IP address : {ip}")
-    logger.debug(f"Local port : {port}")
+        logger = logging.getLogger('main')
 
-    channel = socks.socksocket(family=socket.AF_INET, type=socket.SOCK_STREAM)
-    channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        logger.debug(f"Local IP address : {ip}")
+        logger.debug(f"Local port : {port}")
 
-    channel.bind((ip, port))
-    channel.listen(1)
-    logger.info(f"Listening on {ip}:{port}")
+        channel = socks.socksocket(family=socket.AF_INET, type=socket.SOCK_STREAM)
+        channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    while True: 
-        channel, cliAddress = channel.accept()
-        logger.info(f"Received connection from agent {cliAddress[0]}")
+        channel.bind((ip, port))
+        channel.listen(1)
+        logger.info(f"Listening on {ip}:{port}")
 
-        return channel
+        while True: 
+            channel, cliAddress = channel.accept()
+            logger.info(f"Received connection from agent {cliAddress[0]}")
 
-    
+            return channel
+
+    except KeyboardInterrupt:
+        return False    
 
 
 def bind_tcp(ip, port, proxy):
