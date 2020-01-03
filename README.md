@@ -8,6 +8,7 @@
   - [Factory](#factory)
     - [Options](#options)
     - [About agent compression](#about-agent-compression)
+    - [About agent compilation](#about-agent-compilation)
     - [Demo](#demo)
 
 Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool
@@ -114,6 +115,8 @@ exec(zlib.decompress(base64.b64decode('eJwrKMrMK9FQz0jNyclXKM8vyklR1+QCAFYWBzM='
 
 The compression is an esay way to perform script obfuscation, **but reverse compression is also easy**.  
 That's why Py314 can perform several successive compressions, with different methods between each loops
+
+### About agent compilation
 
 
 
