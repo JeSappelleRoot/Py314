@@ -236,7 +236,7 @@ def sendFile(channel, password, request):
     if transfer is True:
 
         with open(tempFile, 'rb') as fileStream:
-            binaryData = fileStream.read()
+            binaryData = fileStream.read()    
             channel.sendall(binaryData)
     
         os.remove(tempFile)
