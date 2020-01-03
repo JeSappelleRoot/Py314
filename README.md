@@ -7,6 +7,7 @@
 - [About modules](#about-modules)
   - [Factory](#factory)
     - [Options](#options)
+    - [About agent compression](#about-agent-compression)
     - [Demo](#demo)
 
 Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool
@@ -91,6 +92,30 @@ Many options can be used with factory module :
 *The remote agent will bind the local machine with given couple host:port to try to establish a connection with Py314*
 
 ![types](https://user-images.githubusercontent.com/52102633/71740851-f573e380-2e22-11ea-8e28-3fafc3c6e4d8.png)
+
+
+### About agent compression
+
+Compression is performed with `pyinifier` module :  
+- `bzip2` method
+- `gzip` method
+- `lzma` method
+
+Imagine a simple script with the following content : 
+```py
+print('hello world')
+```
+
+With `gzip` compression method, the content will be : 
+```py
+import zlib, base64
+exec(zlib.decompress(base64.b64decode('eJwrKMrMK9FQz0jNyclXKM8vyklR1+QCAFYWBzM=')))
+```
+
+The compression is an esay way to perform script obfuscation, **but reverse compression is also easy**.  
+That's why Py314 can perform several successive compressions, with different methods between each loops
+
+
 
 ### Demo
 
