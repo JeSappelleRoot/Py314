@@ -172,7 +172,7 @@ class Prompt(Cmd):
                 for agent in self.availableTypes:
                     print(f" - {agent}")
 
-            if option == 'compress' or option == 'compile':
+            elif option == 'compress' or option == 'compile':
                 if value.capitalize() == 'True':
                         self.optionsDict[option][1] = True
                 elif value.capitalize() == 'False':
