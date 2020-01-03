@@ -118,7 +118,9 @@ That's why Py314 can perform several successive compressions, with different met
 
 ### About agent compilation
 
-
+Compilation follow the following recipe : 
+- convert Python 3 agent code in Cython language (improve performances) with Python interpreter embed
+- compile Cython C source file with gcc to get an Unix ELF binary type (**platform x64/x86 depend of your system**)
 
 ### Demo
 
