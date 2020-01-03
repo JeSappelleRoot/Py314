@@ -131,9 +131,6 @@ class Prompt(Cmd):
     def do_options(self, arg):
         """Show currents settings of handler"""
 
-        print("""\nThe bind_agent handler is designed to bind a specified host with IP & port combination.""")
-        print("""If the connection is successfull, a shell is automatically give, and remote actions are allowed\n""")
-
         table = PrettyTable()
         headers = ['weight', 'name', 'value', 'description']
         table.field_names = headers
