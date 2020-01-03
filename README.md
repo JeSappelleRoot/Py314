@@ -122,6 +122,16 @@ Compilation follow the following recipe :
 - convert Python 3 agent code in Cython language (improve performances) with Python interpreter embed
 - compile Cython C source file with gcc to get an Unix ELF binary type (**platform x64/x86 depend of your system**)
 
+>**Cython command** :  
+`cython -3 -v --embed agent.py -o agent.c`  
+`-3` is used to specify Python 3 (Python2 by default)  
+`--embed` is used to embed the Python interpreter
+
+>**GCC command** :  
+`gcc agent.c -o bind_agent $(pkg-config --libs --cflags python3)`  
+`$(pkg-config --libs --cflags python3)` is used to automatically generate includes paths : `-I/usr/include/python3.7m -I/usr/include/x86_64-linux-gnu/python3.7m -lpython3.7m`
+
+
 ### Demo
 
 ![factory](https://user-images.githubusercontent.com/52102633/71747085-57891480-2e34-11ea-922e-1b090635a670.gif)
