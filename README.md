@@ -80,7 +80,7 @@ Many options can be used with factory module :
 - **outfile**, to define the output agent file (default is ~/.Py314 folder)
 - **compress**, to enable compression (True or False)
 - **iterations**, to set the number of successives compressions (1 mininum)
-- **compile**, to enable final agent compilation (ELF 64 bit binary)
+- **compile**, to enable final agent compilation (Unix ELF binary)
 
 >In case of **bind_agent** agent type :  
 **host** option will be an IP address assigned in the remote system  
