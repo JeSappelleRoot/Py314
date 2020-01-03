@@ -145,3 +145,13 @@ Handler is the module used to try to establish a connection with a remote Py314 
 - **port**, to define a port to bind or to listen
 - **proxy**, to specify a proxy to use, only with **bind_agent** type (support HTTP, SOCKS4 and SOCKS5 proxy)
 - **type**, to specify the type of remote agent
+
+>In case of **bind_agent** agent type :  
+**host** option will be an IP address used by remote address
+**port** option will be a port used by remote agent
+*Py314 will bind given couple host:port to try to establish a connection with remote agent*
+
+>In case of **reverse_listener** agent type :   
+**host** option will be a existing IP address on the local machine  
+**port** option will be a available port on the local machine  
+*The remote agent will bind the local machine with given couple host:port to try to establish a connection with Py314*
