@@ -351,8 +351,7 @@ def ConnectAgent(dictionnary):
             if type(channel) == bool:
                 logger.debug('Returned channel is false')
                 return
-            
-
+                
         challenge = passwordChallenge(channel, ciperPassword)
 
 
@@ -368,7 +367,11 @@ def ConnectAgent(dictionnary):
         try:
 
             agentPrompt = Agent()
-            agentPrompt.prompt = colored(f"agent@{host}:{port} > ", 'green') 
+
+            remoteAddr = channel.getpeername()[0]
+            remotePort = channel.getpeername()[1]
+
+            agentPrompt.prompt = colored(f"agent@{remoteAddr}:{remotePort} > ", 'green') 
             agentPrompt.define_channel(channel)
             agentPrompt.define_password(password)
             agentPrompt.cmdloop()
