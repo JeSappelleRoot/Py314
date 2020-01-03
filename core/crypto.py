@@ -82,7 +82,7 @@ def encrypt_message(password, message):
 
 
 def decrypt_file(password, infile, outfile):
-    """Encrypt file"""
+    """Decrypt file"""
 
     try:
 
@@ -103,7 +103,10 @@ def decrypt_file(password, infile, outfile):
 
         logger.debug(f"Source file for decryption : {infile}")
         logger.debug(f"Destination for decryption : {outfile}")
-            
+    
+    except InvalidToken:
+        logger.warning('Bad Fernet key')
+
     except Exception as error:
         logger.warning(f"An error occured during file decryption : {error}")
 
