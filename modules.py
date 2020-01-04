@@ -9,13 +9,13 @@ def Check(channel, password):
 
     try:
 
-        BUFFER_SIZE = 1024
+        buffer_size = 1024
 
         # Get main logger, define in core.logger
         logger = logging.getLogger('main')
 
         # Define a buffer size
-        bufferSize = BUFFER_SIZE
+        #bufferSize = BUFFER_SIZE
         # Encrypt 'alive ?' message with symmetric key
         checkMessage = crypto.encrypt_message(password, 'alive ?').encode()
         # Send encrypted message
@@ -26,13 +26,13 @@ def Check(channel, password):
         # While true (while receiving data)
         while True:
             # Temporary buffer receive data
-            tempBuffer = channel.recv(bufferSize)
+            tempBuffer = channel.recv(buffer_size)
             # Add these data to rawResponse
             rawResponse += tempBuffer
             
             # If data in temporary buffer are smaller than the buffer size, break While loop
             # 'cause, no more data
-            if len(tempBuffer) < bufferSize:
+            if len(tempBuffer) < buffer_size:
                 break
 
         # Decode answer with crypto module
@@ -52,7 +52,7 @@ def Download(channel, password, source, destination):
     try:
 
 
-        BUFFER_SIZE = 1024
+        buffer_size = 1024
 
         # Get the main logger, defined in logger module
         logger = logging.getLogger('main')
@@ -83,7 +83,7 @@ def Download(channel, password, source, destination):
         # Then, send this first message
         channel.sendall(encryptedMessage.encode())
 
-        bufferSize = BUFFER_SIZE
+        #bufferSize = BUFFER_SIZE
 
         # While True, receive data
         while True:
@@ -107,7 +107,7 @@ def Download(channel, password, source, destination):
             # Open a temporary encrypted file in append binary mode
             with open(tempFile, 'ab') as fileStream:
                 # Define a bufferSize and a rawFile content
-                bufferSize, rawFile = BUFFER_SIZE, b''
+                rawFile = b''
             
                 # While loop to complete socket buffer in recv 
                 # If the remote agent needs more data than buffer size, he's will send file in many times
@@ -140,7 +140,8 @@ def Upload(channel, password, source, destination):
 
     try:
         # Define a buffer size in bytes
-        BUFFER_SIZE = 1024
+        #BUFFER_SIZE = 4096
+        buffer_size = 1024
 
         # Get the main logger, defined in logger module
         logger = logging.getLogger('main')
@@ -160,23 +161,26 @@ def Upload(channel, password, source, destination):
         tempFile = f"{py314Folder}/temp.crypt"
         # Some debug here
         logger.debug(f"Temporary encrypted file : {tempFile}")
+        # Encrypt file and get him size file in bytes
+        crypto.encrypt_file(password, source, tempFile)
+        nbBytes = os.path.getsize(tempFile)
 
         
         # Craft a first message, with source file and destination directory
-        message = f"upload {source} {destination}"
+        message = f"upload {source} {destination} {nbBytes}"
         # Encrypt message with symmetric key
         encryptedMessage = crypto.encrypt_message(password, message)
         # Then, send this first message
         channel.sendall(encryptedMessage.encode())
     
         # Define a empty agentAnswer and a buffer size
-        agentAnswer, bufferSize = b'', BUFFER_SIZE
+        agentAnswer= b''
 
         # While True, receive data
         while True:
             logger.debug('Waiting for agent answer about transfer...')
-            agentAnswer = channel.recv(bufferSize)
-            if len(agentAnswer) < bufferSize:
+            agentAnswer = channel.recv(buffer_size)
+            if len(agentAnswer) < buffer_size:
                 logger.debug('break recv while loop')
                 break
         # Decrypt agent answer
@@ -186,22 +190,49 @@ def Upload(channel, password, source, destination):
         # If agent's answer is '!', the remote directory doesn't exist
         if decryptedAnswer == '!':
             logger.warning(f"Remote directory {destination} doesn't exist")
+            os.remove(tempFile)
 
         # Else if agent say 'ready', continue the upload request
         elif decryptedAnswer == 'ready':
             logger.debug('Agent is ready for file transfer')
             # Encrypt file with crypto module
-            crypto.encrypt_file(password, source, tempFile)
+
+
             # With statement to open file in Read Binary mode
             with open(tempFile, 'rb') as fileStream:
-                
-                # Assign data, and use sendall() through socket
                 binaryData = fileStream.read()
-                channel.sendall(binaryData)
+                channel.send(binaryData)
+                #logger.debug(f"Partial file sended ({len(binaryData)} bytes) : {binaryData}")
+
+
+                    
+
+            """
+            # Assign data to var
+            binaryData = fileStream.read(buffer_size)
+            while binaryData:
+
+                channel.send(binaryData)
+                logger.debug(f"Partial file sended ({len(binaryData)} bytes) : {binaryData}")
+                binaryData = fileStream.read(buffer_size)
+            """
+                
+            #channel.sendall(binaryData)
+
+
+            # Send binary data through socket
+            #channel.send(binaryData)        
+            # Send all data through channel
+            #logger.debug(f"Binary data from {source} : {binaryData}")
+        
+            """
+            channel.sendall(binaryData)
+            """
             # Finally remove temporary encrypted file
             os.remove(tempFile)
             logger.debug(f"File {tempFile} removed")
             logger.info(f"File {source} successfully uploaded")
+            
 
     except Exception as error:
         logger.warning('An error occured during sending file : ')
@@ -212,7 +243,7 @@ def Shell(channel, password, command):
     """Try to interact with remote agent with a shell"""
 # Module to send a shell command to remote agent
 
-    BUFFER_SIZE = 1024
+    buffer_size = 1024
 
     logger = logging.getLogger('main')
 
@@ -220,7 +251,7 @@ def Shell(channel, password, command):
     logger.debug(f"Password given : {password}")
 
     # Define a buffer size, 1024 bytes
-    bufferSize = BUFFER_SIZE
+    #bufferSize = BUFFER_SIZE
 
     if command == b'':
         pass
@@ -234,14 +265,14 @@ def Shell(channel, password, command):
         while True:
             logger.debug('recv from socket...')
 
-            tempBuffer = channel.recv(bufferSize)
+            tempBuffer = channel.recv(buffer_size)
             rawResponse += tempBuffer
             
             logger.debug(f'Partial answer : {rawResponse.decode()}')
             logger.debug(f'Raw answer lengh : {len(rawResponse)}')
             #logger.debug(f'Temporary buffer : {tempBuffer}')
             # If all data are smaller than the buffer size, break While loop
-            if len(tempBuffer) < bufferSize:
+            if len(tempBuffer) < buffer_size:
                 logger.debug('break recv while loop')
                 break
             
