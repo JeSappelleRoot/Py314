@@ -236,19 +236,27 @@ def Shell(channel, password, command):
         channel.sendall(command.encode())
 
         rawResponse, tempBuffer = b'', b''
+
+        cryptedAnswerSize = channel.recv(buffer_size)
+        answerSize = crypto.decrypt_message(password, cryptedAnswerSize.decode())
+        logger.debug(f"Ready to receive {answerSize} bytes")
+
+        totalSize = 0
         # While True, receive data
         while True:
             logger.debug('recv from socket...')
 
             tempBuffer = channel.recv(buffer_size)
+            totalSize = totalSize + len(tempBuffer)
             rawResponse += tempBuffer
             
-            logger.debug(f'Partial answer : {tempBuffer.decode()}')
+            #logger.debug(f'Partial answer : {tempBuffer.decode()}')
             logger.debug(f'Partial answer lengh : {len(tempBuffer)}')
-            #logger.debug(f'Temporary buffer : {tempBuffer}')
+            logger.debug(f"Total answer size : {totalSize}")
+
             # If all data are smaller than the buffer size, break While loop
-            if len(tempBuffer) < buffer_size:
-                logger.debug('break recv while loop')
+            if totalSize >= int(answerSize):
+                logger.debug('Enough bytes received')
                 break
             
         # Decode bytes to string to read the answer of the remote agent
