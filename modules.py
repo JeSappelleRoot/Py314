@@ -107,7 +107,7 @@ def Download(channel, password, source, destination):
 
             # Define a progress bar
             progress = tqdm.tqdm(range(int(fileSize)), 
-                    f"Download {source}", 
+                    f"Downloading {source}", 
                     unit="B", 
                     unit_scale=True, 
                     unit_divisor=buffer_size,
@@ -213,7 +213,7 @@ def Upload(channel, password, source, destination):
 
             # Define a progress bar
             progress = tqdm.tqdm(range(nbBytes), 
-                                f"Sending {source}", 
+                                f"Uploading {source}", 
                                 unit="B", 
                                 unit_scale=True, 
                                 unit_divisor=buffer_size,
