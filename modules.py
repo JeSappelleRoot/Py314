@@ -141,7 +141,7 @@ def Upload(channel, password, source, destination):
     try:
         # Define a buffer size in bytes
         #BUFFER_SIZE = 4096
-        buffer_size = 1024
+        buffer_size = 2048
 
         # Get the main logger, defined in logger module
         logger = logging.getLogger('main')
