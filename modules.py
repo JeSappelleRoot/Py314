@@ -1,5 +1,6 @@
 
 import os
+import tqdm
 import logging
 import core.crypto as crypto
 
@@ -145,7 +146,7 @@ def Upload(channel, password, source, destination):
     try:
         # Define a buffer size in bytes
         #BUFFER_SIZE = 4096
-        buffer_size = 2048
+        buffer_size = 1024
 
         # Get the main logger, defined in logger module
         logger = logging.getLogger('main')
@@ -200,12 +201,27 @@ def Upload(channel, password, source, destination):
         elif decryptedAnswer == 'ready':
             logger.debug('Agent is ready for file transfer')
 
+            progress = tqdm.tqdm(range(nbBytes), 
+                                f"Sending {source}", 
+                                unit="B", 
+                                unit_scale=True, 
+                                unit_divisor=buffer_size,
+                                leave=False
+                                )
 
             # With statement to open file in Read Binary mode
             # and send it through socket
             with open(tempFile, 'rb') as fileStream:
-                binaryData = fileStream.read()
-                channel.send(binaryData)
+
+                for _ in progress:
+                    binaryData = fileStream.read(buffer_size)
+                    channel.send(binaryData)
+                    
+                    progress.update(len(binaryData))
+                    if not binaryData:
+                        break
+
+                    
 
             # Finally remove temporary encrypted file
             os.remove(tempFile)
