@@ -104,25 +104,35 @@ def Download(channel, password, source, destination):
 
         # Elif agent tell he's ready to send remote file
         elif state == 'ready':
+
+            # Define a progress bar
+            progress = tqdm.tqdm(range(int(fileSize)), 
+                    f"Download {source}", 
+                    unit="B", 
+                    unit_scale=True, 
+                    unit_divisor=buffer_size,
+                    leave=False
+                    )
             
             logger.debug(f"Agent is ready for file transfer ({fileSize} bytes)")
             # Open a temporary encrypted file in append binary mode
             with open(tempFile, 'ab') as fileStream:
-                # Define a bufferSize and a rawFile content
-                rawFile = b''
+                # Define rawFile content and totalSize of received bytes
+                rawFile, totalSize = b'', 0
             
-                # While loop to complete socket buffer in recv 
-                # If the remote agent needs more data than buffer size, he's will send file in many times
-                totalSize = 0
-                while True:
+                for _ in progress:
+
                     rawFile = channel.recv(buffer_size)
                     fileStream.write(rawFile)
-                    logger.debug(f"Write partial file : {rawFile}")
+                    progress.update(len(rawFile))
                     logger.debug(f"Partiel answer size : {len(rawFile)} bytes")
+                    
                     totalSize = totalSize + len(rawFile)
                     if totalSize >= int(fileSize):
                         logger.debug('Enough bytes received')
                         break
+
+
             logger.debug(f"Temporary file successfully written")
 
             # Decrypt final destination plain file
@@ -201,6 +211,7 @@ def Upload(channel, password, source, destination):
         elif decryptedAnswer == 'ready':
             logger.debug('Agent is ready for file transfer')
 
+            # Define a progress bar
             progress = tqdm.tqdm(range(nbBytes), 
                                 f"Sending {source}", 
                                 unit="B", 
