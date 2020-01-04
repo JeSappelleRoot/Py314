@@ -241,6 +241,12 @@ def sendFile(channel, password, request):
         logging.debug(f"File {{tempFile}} removed")
 
 
+def sendSize(channel, password, size):
+
+    logging.debug(f"Size to encrypt : {{size}}")
+    encryptedSize = encrypt_message(password, size)
+
+    channel.sendall(encryptedSize.encode())
 
 
 
@@ -304,6 +310,9 @@ def serverHandler(channel, password):
                 output = shellCommand(clientRequest, workingDir)
 
                 encryptedOutput = encrypt_message(password, output)
+
+                sendSize(channel, password, len(encryptedOutput))
+
                 channel.sendall(encryptedOutput.encode())
 
 
