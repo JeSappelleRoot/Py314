@@ -157,6 +157,7 @@ def receiveFile(channel, password, request):
     src = request.split(' ')[1]
     srcBasename = os.path.basename(src)
     dst = request.split(' ')[2]
+    fileSize = int(request.split(' ')[3])
 
     dstFile = f"{{dst}}/{{srcBasename}}"
     tempFile = f"{{dst}}/temp.crypt"
@@ -166,7 +167,7 @@ def receiveFile(channel, password, request):
     logging.debug(f"Request : {{request.split(' ')[0]}}")
     logging.debug(f"Wanted filename : {{srcBasename}}")
     logging.debug(f"Destination folder : {{dst}}")
-    logging.debug(f"Temporary file : {{tempFile}}")
+    logging.debug(f"Temporary file : {{tempFile}} ({{fileSize}} bytes)")
     logging.debug(f"Final file : {{dstFile}}")
 
     if not os.path.isdir(dst):
@@ -183,21 +184,18 @@ def receiveFile(channel, password, request):
     channel.sendall(encryptedAnswer.encode())
     logging.debug(f"Sending answer : {{answer}}")
 
+    
+
     if transfer is True:
-
+        totalBytes = 0
         with open(tempFile, 'ab') as fileStream:
-
                 bufferSize = BUFFER_SIZE
-                rawFile = b''
-                
-                # While loop to complete socket buffer in recv 
-                while True:
-                    rawFile = channel.recv(bufferSize)
-                    fileStream.write(rawFile)
-                    logging.debug(f"Write partial file : {{rawFile}}")
-                    if len(rawFile) < bufferSize:
-                        logging.debug('break recv while loop')
-                        break
+
+                while totalBytes < fileSize:
+                    readedBytes = channel.recv(bufferSize)
+                    totalBytes = totalBytes + len(readedBytes)
+                    fileStream.write(readedBytes)
+
         logging.debug(f"Temporary file successfully written")
 
         decrypt_file(password, tempFile, dstFile)
