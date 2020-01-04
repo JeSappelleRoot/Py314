@@ -244,7 +244,7 @@ def sendFile(channel, password, request):
 def sendSize(channel, password, size):
 
     logging.debug(f"Size to encrypt : {{size}}")
-    encryptedSize = encrypt_message(password, size)
+    encryptedSize = encrypt_message(password, str(size))
 
     channel.sendall(encryptedSize.encode())
 
