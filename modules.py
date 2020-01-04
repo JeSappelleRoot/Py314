@@ -88,22 +88,23 @@ def Download(channel, password, source, destination):
         # While True, receive data
         while True:
             logger.debug('Waiting for agent answer about download...')
-            agentAnswer = channel.recv(bufferSize)
-            if len(agentAnswer) < bufferSize:
+            agentAnswer = channel.recv(buffer_size)
+            if len(agentAnswer) < buffer_size:
                 logger.debug('break recv while loop')
                 break
         # Decrypt agent answer
         decryptedAnswer = crypto.decrypt_message(password, agentAnswer.decode())
         logger.debug(f"Agent answer : {decryptedAnswer}")
+        state, fileSize = decryptedAnswer.split(' ')[0], decryptedAnswer.split(' ')[1]
 
         # If decrypted answer is '!', the remote agent tell that the remote folder doesn't exist
-        if decryptedAnswer == '!':
+        if state == '!':
             logger.warning(f"Remote file {source} doesn't exist")
 
         # Elif agent tell he's ready to send remote file
-        elif decryptedAnswer == 'ready':
+        elif state == 'ready':
             
-            logger.debug('Agent is ready for file transfer')
+            logger.debug(f"Agent is ready for file transfer ({fileSize} bytes)")
             # Open a temporary encrypted file in append binary mode
             with open(tempFile, 'ab') as fileStream:
                 # Define a bufferSize and a rawFile content
@@ -111,12 +112,15 @@ def Download(channel, password, source, destination):
             
                 # While loop to complete socket buffer in recv 
                 # If the remote agent needs more data than buffer size, he's will send file in many times
+                totalSize = 0
                 while True:
-                    rawFile = channel.recv(bufferSize)
+                    rawFile = channel.recv(buffer_size)
                     fileStream.write(rawFile)
                     logger.debug(f"Write partial file : {rawFile}")
-                    if len(rawFile) < bufferSize:
-                        logger.debug('break recv while loop')
+                    logger.debug(f"Partiel answer size : {len(rawFile)} bytes")
+                    totalSize = totalSize + len(rawFile)
+                    if totalSize >= int(fileSize):
+                        logger.debug('Enough bytes received')
                         break
             logger.debug(f"Temporary file successfully written")
 
