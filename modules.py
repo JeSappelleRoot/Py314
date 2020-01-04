@@ -195,39 +195,14 @@ def Upload(channel, password, source, destination):
         # Else if agent say 'ready', continue the upload request
         elif decryptedAnswer == 'ready':
             logger.debug('Agent is ready for file transfer')
-            # Encrypt file with crypto module
 
 
             # With statement to open file in Read Binary mode
+            # and send it through socket
             with open(tempFile, 'rb') as fileStream:
                 binaryData = fileStream.read()
                 channel.send(binaryData)
-                #logger.debug(f"Partial file sended ({len(binaryData)} bytes) : {binaryData}")
 
-
-                    
-
-            """
-            # Assign data to var
-            binaryData = fileStream.read(buffer_size)
-            while binaryData:
-
-                channel.send(binaryData)
-                logger.debug(f"Partial file sended ({len(binaryData)} bytes) : {binaryData}")
-                binaryData = fileStream.read(buffer_size)
-            """
-                
-            #channel.sendall(binaryData)
-
-
-            # Send binary data through socket
-            #channel.send(binaryData)        
-            # Send all data through channel
-            #logger.debug(f"Binary data from {source} : {binaryData}")
-        
-            """
-            channel.sendall(binaryData)
-            """
             # Finally remove temporary encrypted file
             os.remove(tempFile)
             logger.debug(f"File {tempFile} removed")
@@ -268,8 +243,8 @@ def Shell(channel, password, command):
             tempBuffer = channel.recv(buffer_size)
             rawResponse += tempBuffer
             
-            logger.debug(f'Partial answer : {rawResponse.decode()}')
-            logger.debug(f'Raw answer lengh : {len(rawResponse)}')
+            logger.debug(f'Partial answer : {tempBuffer.decode()}')
+            logger.debug(f'Partial answer lengh : {len(tempBuffer)}')
             #logger.debug(f'Temporary buffer : {tempBuffer}')
             # If all data are smaller than the buffer size, break While loop
             if len(tempBuffer) < buffer_size:
