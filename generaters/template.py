@@ -220,11 +220,11 @@ def sendFile(channel, password, request):
         answer = '!'
         transfer = False
     elif os.path.isfile(localFile):
-        logging.debug(f"Local file {{localFile}} exist")
-        answer = 'ready'
-        transfer = True
-
+        logging.debug(f"Local file {{localFile}} exist, launch encryption")
         encrypt_file(password, localFile, tempFile)
+        fileSize = os.path.getsize(tempFile)
+        answer = f"ready {{fileSize}}"
+        transfer = True
 
     encryptedAnswer = encrypt_message(password, answer)
     channel.sendall(encryptedAnswer.encode())
