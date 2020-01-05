@@ -11,8 +11,10 @@
     - [About agent compilation](#about-agent-compilation)
     - [Demo](#demo)
   - [Handler](#handler)
+    - [What can I do with Py314 ?](#what-can-i-do-with-py314)
 
-Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool
+Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool.  
+All traffic between Py314 and agents are fully symmetric encrypted with Fernet Python3 module
 
 
 `####################################################`  
@@ -155,3 +157,21 @@ Handler is the module used to try to establish a connection with a remote Py314 
 **host** option will be a existing IP address on the local machine  
 **port** option will be a available port on the local machine  
 *The remote agent will bind the local machine with given couple host:port to try to establish a connection with Py314*
+
+![handler](https://user-images.githubusercontent.com/52102633/71784293-b75bf880-2fb7-11ea-9fe5-8cec4dbe4a40.gif)  
+
+*Assume following configuration :*
+- LAN 10.0.10.0/24
+- Py314 ip address : 10.0.10.1/24
+- Agent ip address : 10.0.10.166
+- Agent type is reverse_listener
+- Py314 listen on 1234 port
+- Password is `demo_Py314`
+
+### What can I do with Py314 ? 
+
+Py314 is voluntarily weak in options, you can only : 
+- check is remote agent is alive (give an answer)
+- download remote file
+- upload local file
+- use basic shell commands
