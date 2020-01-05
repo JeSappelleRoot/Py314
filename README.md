@@ -12,6 +12,7 @@
     - [Demo](#demo)
   - [Handler](#handler)
     - [What can I do with Py314 ?](#what-can-i-do-with-py314)
+- [About encryption](#about-encryption)
 
 Py314 is a RAT (Remote Access Tool) written in Python 3, inspired by the great Metasploit-Framework pentest tool.  
 All traffic between Py314 and agents are fully symmetric encrypted with Fernet Python3 module
@@ -175,3 +176,10 @@ Py314 is voluntarily weak in options, you can only :
 - download remote file
 - upload local file
 - use basic shell commands
+
+# About encryption
+
+Traffic between Py314 and remote agent is fully encrypted with Fernet Python3 module.  
+The password set in factory or in handler modules is used to generate a Fernet key, which will be use to perform symmetric encryption and decryption.  
+Download and upload commands encrypt files before downloading or uploading  
+
