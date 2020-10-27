@@ -2,7 +2,7 @@
 # https://github.com/damnever/pigar
 
 PySocks == 1.6.8
-cryptography == 2.6.1
+cryptography == 3.2
 netaddr == 0.7.19
 pkgconfig == 1.5.1
 prettytable == 0.7.2
